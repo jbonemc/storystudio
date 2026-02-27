@@ -180,19 +180,72 @@ export function generateDocumentSummary(text: string): string {
 
 export function suggestBehaviourChanges(docs: string): string[] {
   const ctx = extractDocumentContext(docs);
-  const { geography, population, domain, domainShort } = ctx;
+  const { geography, population, domain, domainShort, topKeywords } = ctx;
 
-  const p = population || 'the communities this work is designed to help';
+  const lower = docs.toLowerCase();
+  const p = population || 'communities affected by this issue';
   const g = geography ? ` in ${geography}` : '';
+  const gOf = geography || 'this region';
   const d = domainShort || domain || 'this approach';
+  const dFull = domain || 'this work';
 
-  return [
-    `Get funders and policymakers to invest in scaling ${d}${g}`,
-    `Convince decision-makers to include ${d} in national or regional programmes`,
-    `Inspire ${p} to adopt and champion ${d}`,
-    `Motivate researchers and institutions to prioritise ${d} in future work`,
-    `Persuade development organisations to incorporate ${d} into their programmes${g}`,
-  ];
+  // Detect signals from document language
+  const isPolicy    = lower.includes('policy') || lower.includes('government') || lower.includes('minister') || lower.includes('legislation') || lower.includes('strategy');
+  const isFunder    = lower.includes('fund') || lower.includes('grant') || lower.includes('donor') || lower.includes('invest') || lower.includes('budget');
+  const isAcademic  = lower.includes('journal') || lower.includes('publish') || lower.includes('peer review') || lower.includes('future research') || lower.includes('citation');
+  const isPublic    = lower.includes('public') || lower.includes('citizen') || lower.includes('community') || lower.includes('school') || lower.includes('media') || lower.includes('outreach');
+  const isSurvey    = lower.includes('survey') || lower.includes('volunteer') || lower.includes('participant') || lower.includes('citizen science') || lower.includes('trial');
+  const isNGO       = lower.includes('ngo') || lower.includes('organisation') || lower.includes('organization') || lower.includes('programme') || lower.includes('implement');
+  const keyTopic    = topKeywords[0] || d;
+
+  const suggestions: string[] = [];
+
+  // 1 — A concrete DECISION or formal commitment (funder / policymaker)
+  suggestions.push(
+    isPolicy && geography
+      ? `Convince the ${gOf} government to formally include ${d} in its national development or agricultural strategy — moving from interest to a written commitment`
+      : isFunder
+        ? `Get a specific funder to approve a grant for the next phase of this work — not an expression of interest, but a signed commitment with a start date`
+        : `Get the most important decision-maker in your audience to commit to a concrete next step — a funded pilot, a policy inclusion, or a formal review — rather than filing this away`
+  );
+
+  // 2 — A PRACTICE CHANGE on the ground (practitioners / implementers)
+  suggestions.push(
+    population && domain
+      ? `Persuade practitioners who work with ${p}${g} to actively adopt ${d} — not as an experiment, but as their default approach`
+      : isNGO
+        ? `Convince a development organisation${g} to embed ${dFull} into their existing programme design rather than treating it as a one-off pilot`
+        : `Move the people who deliver this kind of work from knowing about ${dFull} to actually using it — changing practice, not just perspective`
+  );
+
+  // 3 — A MINDSET SHIFT (any audience — reframes how they see the problem)
+  suggestions.push(
+    isPolicy
+      ? `Shift policymakers from asking "is this proven?" to asking "what will it take to implement this at scale?" — from scepticism to ownership`
+      : isAcademic
+        ? `Convince peer researchers and research funders to treat ${keyTopic} as a priority area, not a peripheral interest — so it gets the attention and resource it deserves`
+        : `Change how ${p || 'your audience'} thinks about this issue — from "this is too complex to solve" to "this is solvable and someone needs to act"`
+  );
+
+  // 4 — PARTICIPATION or direct engagement (public, volunteers, citizen science, surveys)
+  suggestions.push(
+    isSurvey
+      ? `Recruit [X] volunteers or participants from ${p || 'the target community'}${g} to take part in the next phase of the study`
+      : isPublic || geography
+        ? `Get members of the public${g} — including schools, community groups, or local organisations — to actively engage with this issue: attend, share, or take part in a specific activity`
+        : `Encourage your audience to take one direct action after your talk — sign up, share, respond to a survey, or join a citizen science project — so engagement becomes a habit, not a one-off`
+  );
+
+  // 5 — CHAMPIONING and amplification (peer networks, media, institutions)
+  suggestions.push(
+    isAcademic
+      ? `Get three or more respected peers or institutions to publicly cite, recommend, or co-sign this work — lending it credibility in circles you cannot currently reach yourself`
+      : isPublic
+        ? `Inspire journalists, educators, or community leaders${g} to tell this story to their own audiences — multiplying your reach beyond the room you are standing in`
+        : `Persuade a credible voice in your field — an institution, a network, or a respected individual — to publicly endorse and actively champion ${dFull} on your behalf`
+  );
+
+  return suggestions;
 }
 
 export function generateShouldStatements(docs: string, _behaviourChange: string): string[] {

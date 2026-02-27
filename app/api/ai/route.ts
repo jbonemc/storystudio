@@ -78,12 +78,24 @@ ${documents.slice(0, 3000)}`;
 
       case "suggestBehaviourChanges": {
         const { documents } = params as { documents: string };
-        const prompt = `Based on this research project, suggest 5 concrete behaviour changes the researcher might want from their audience (funders, policymakers, practitioners, etc.). Each should be a specific action or shift in thinking, not just "raise awareness".
+        const prompt = `Read this research project carefully and suggest 5 behaviour change goals the researcher might want from their audience.
+
+CRITICAL RULES:
+- NEVER suggest "raise awareness" or "increase profile" — these are not behaviour changes. A behaviour change is something a specific person does, decides, funds, adopts, or joins.
+- Each of the 5 suggestions must be a DIFFERENT TYPE of change. Cover all five of these categories, one each:
+  1. A concrete DECISION or formal commitment (e.g. approve funding, sign off on a programme, include in a strategy)
+  2. A PRACTICE CHANGE (e.g. adopt a new method, change how practitioners deliver this kind of work)
+  3. A MINDSET SHIFT (e.g. move from scepticism to ownership, from "niche" to "urgent priority")
+  4. PARTICIPATION or direct engagement (e.g. sign up as a volunteer, take part in a survey, join a citizen science project, visit a website, attend an event)
+  5. CHAMPIONING or amplification (e.g. publicly endorse, cite, share with their network, teach it in schools)
+- Be SPECIFIC to this research — name the actual topic, geography, population or domain from the document
+- Start each suggestion with an active verb: "Commit to...", "Adopt...", "Shift from... to...", "Sign up to...", "Publicly endorse..."
+- Each suggestion should be 1-2 sentences, concrete enough that the researcher could put it on a slide
 
 Respond with JSON: {"suggestions": ["suggestion 1", "suggestion 2", "suggestion 3", "suggestion 4", "suggestion 5"]}
 
 Document:
-${documents.slice(0, 2000)}`;
+${documents.slice(0, 2500)}`;
         const raw = await callClaude(prompt);
         const { suggestions } = await parseJSON<{ suggestions: string[] }>(raw);
         return NextResponse.json({ result: suggestions });
