@@ -47,7 +47,7 @@ let _reqUserEmail: string | undefined;
 async function callClaude(prompt: string): Promise<string> {
   if (!client) throw new Error("No API key");
   const msg = await client.messages.create({
-    model: "claude-sonnet-4-5-20241022",
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: prompt }],
@@ -394,7 +394,7 @@ Respond with JSON: {
         return NextResponse.json({ error: "Unknown type" }, { status: 400 });
     }
   } catch (err) {
-    console.error("AI API error:", err);
+    console.error("AI API error for type:", type, "—", err instanceof Error ? err.message : err);
     // Fall back to mock on any error
     return mockFallback(type, params);
   }
