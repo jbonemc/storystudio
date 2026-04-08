@@ -17,6 +17,7 @@ import {
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 const client = apiKey ? new Anthropic({ apiKey }) : null;
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-5-20250929";
 
 // ── System prompt for Story Studio ──────────────────────────────────────────
 const SYSTEM_PROMPT = `You are the Story Studio Content Tool — a warm, expert communications coach built on the Story Studio framework by Jonathan McCrea (storystudiocourse.com).
@@ -47,7 +48,7 @@ let _reqUserEmail: string | undefined;
 async function callClaude(prompt: string): Promise<string> {
   if (!client) throw new Error("No API key");
   const msg = await client.messages.create({
-    model: "claude-sonnet-4-5-20250929",
+    model: CLAUDE_MODEL,
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: prompt }],
@@ -395,7 +396,14 @@ Respond with JSON: {
     }
   } catch (err) {
     console.error("AI API error for type:", type, "—", err instanceof Error ? err.message : err);
-    // Fall back to mock on any error
+    // In production, return the error so users know something failed.
+    // In dev (no API key), fall back to mocks for testing.
+    if (client) {
+      return NextResponse.json(
+        { error: "The AI service is temporarily unavailable. Please try again in a moment." },
+        { status: 502 }
+      );
+    }
     return mockFallback(type, params);
   }
 }
