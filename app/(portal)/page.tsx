@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { episodes } from "@/lib/episodes/data";
-import { Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic } from "lucide-react";
+import { Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FileText, Download } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+const RESOURCES = [
+  { name: "Story Studio Handbook", file: "story-studio-handbook.pdf", description: "The complete Story Studio reference guide" },
+  { name: "Episode 1 — Language", file: "episode-1-language.pdf", description: "Building blocks: visual, emotional, and logical language" },
+  { name: "Episode 2 — Story", file: "episode-2--story.pdf", description: "Story structures: PIP, setup-conflict-resolution, past-event-present" },
+  { name: "Episode 3 — Audience", file: "episode-3--audience-.pdf", description: "Sharing your story: delivery, interviews, and adaptation" },
+  { name: "Content Tool", file: "content-tool.pdf", description: "The 13-item communication planning template" },
+];
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic,
@@ -192,6 +201,76 @@ export default function DashboardPage() {
                 {item.desc}
               </p>
             </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Resources — downloadable PDFs */}
+      <ResourcesSection />
+    </div>
+  );
+}
+
+function ResourcesSection() {
+  const supabase = createClient();
+
+  async function handleDownload(file: string, name: string) {
+    const { data, error } = await supabase.storage
+      .from("resources")
+      .createSignedUrl(file, 60);
+
+    if (error || !data?.signedUrl) {
+      alert("Unable to download — please try again.");
+      return;
+    }
+
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = name + ".pdf";
+    a.click();
+  }
+
+  return (
+    <div className="bg-gray-50/50 border-t border-gray-100">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+        <motion.div
+          className="flex items-center gap-3 mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+        >
+          <div className="h-px flex-1 bg-gray-200" />
+          <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-navy/40 flex items-center gap-2">
+            <FileText className="w-3.5 h-3.5" />
+            Resources
+          </h2>
+          <div className="h-px flex-1 bg-gray-200" />
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {RESOURCES.map((resource, idx) => (
+            <motion.button
+              key={resource.file}
+              onClick={() => handleDownload(resource.file, resource.name)}
+              className="group text-left bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-lg p-5 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ delay: idx * 0.06, duration: 0.35 }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl bg-navy/5 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-navy/40" />
+                </div>
+                <Download className="w-4 h-4 text-gray-300 group-hover:text-navy transition-colors" />
+              </div>
+              <h3 className="text-sm font-bold text-navy mb-1">
+                {resource.name}
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                {resource.description}
+              </p>
+            </motion.button>
           ))}
         </div>
       </div>
