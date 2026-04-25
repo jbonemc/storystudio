@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppState } from "@/lib/types";
 import { aiSummariseDocument } from "@/lib/aiClient";
-import { FileText, ArrowRight } from "lucide-react";
+import { FileText, ArrowRight, AlertCircle } from "lucide-react";
 
 interface Props {
   state: AppState;
@@ -14,17 +15,21 @@ interface Props {
 }
 
 export function UploadStep({ state, updateState, onNext }: Props) {
+  const [error, setError] = useState("");
+
   const handleAnalyse = async () => {
+    setError("");
     updateState({ isLoading: true });
     try {
       const summary = await aiSummariseDocument(state.documents);
       updateState({ documentSummary: summary, isLoading: false });
     } catch {
+      setError("Something went wrong analysing your content. Please try again.");
       updateState({ isLoading: false });
     }
   };
 
-  const canProceed = state.documentSummary && state.documents.split(/\s+/).length >= 15;
+  const canProceed = !!state.documentSummary;
 
   return (
     <div className="space-y-5">
@@ -47,7 +52,7 @@ export function UploadStep({ state, updateState, onNext }: Props) {
           </div>
           <Textarea
             value={state.documents}
-            onChange={(e) => updateState({ documents: e.target.value, documentSummary: "" })}
+            onChange={(e) => { updateState({ documents: e.target.value, documentSummary: "" }); setError(""); }}
             placeholder="Paste your abstract, summary, or project description here..."
             className="min-h-[200px] resize-y text-sm border-gray-300 focus:border-[#2E75B6] focus:ring-[#2E75B6]"
           />
@@ -65,6 +70,13 @@ export function UploadStep({ state, updateState, onNext }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
+      )}
 
       {state.documentSummary && (
         <Card className="border-[#2E75B6]/30 bg-[#EAF2FA]/50">
