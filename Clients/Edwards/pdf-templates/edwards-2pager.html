@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Studio - Edwards Lifesciences - 2 Page Summary</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400;1,8..60,500&display=swap');
+
+  :root {
+    --navy: #0D1B4A;
+    --lavender: #C4B3D4;
+    --pink: #E8B4C8;
+    --peach: #F2C4A8;
+    --cream: #FAF8F5;
+    --text: #2D2D2D;
+    --text-light: #6B6B6B;
+    --page-w: 210mm;
+    --page-h: 297mm;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e0ddd8;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .page {
+    width: var(--page-w);
+    height: var(--page-h);
+    background: #fff;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-header {
+    background: var(--navy);
+    padding: 36px 54px 32px;
+    position: relative;
+  }
+  .cover-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--lavender) 33.3%, var(--pink) 33.3% 66.6%, var(--peach) 66.6%);
+  }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .logo-mark { display: flex; gap: 6px; }
+  .logo-mark span { width: 22px; height: 28px; border-radius: 3px; transform: skewX(-6deg); }
+  .logo-mark span:nth-child(1) { background: var(--lavender); }
+  .logo-mark span:nth-child(2) { background: var(--pink); }
+  .logo-mark span:nth-child(3) { background: var(--peach); }
+  .logo-text { font-size: 12px; font-weight: 600; letter-spacing: 5px; color: #fff; text-transform: uppercase; }
+  .cover-header h1 { font-size: 36px; font-weight: 500; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .cover-header h1 em { font-family: 'Source Serif 4', serif; font-weight: 300; font-style: italic; color: var(--peach); }
+  .cover-header .subtitle { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 400; line-height: 1.6; }
+  .cover-meta {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 400;
+  }
+  .cover-meta strong { color: rgba(255,255,255,0.75); font-weight: 500; }
+  .cover-meta .for { letter-spacing: 2px; text-transform: uppercase; font-weight: 500; font-size: 9px; }
+  .cover-meta .ef { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 3px; }
+
+  .body { flex: 1; padding: 30px 54px 24px; display: flex; flex-direction: column; }
+
+  .section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--navy); margin-bottom: 10px; margin-top: 20px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .body p {
+    font-size: 11pt; font-weight: 400; line-height: 1.75; color: var(--text); margin-bottom: 10px;
+  }
+  .body p strong { font-weight: 600; color: var(--navy); }
+
+  .p2-header {
+    background: var(--navy);
+    padding: 26px 54px 22px;
+  }
+  .p2-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .p2-header h2 { font-size: 28px; font-weight: 500; color: #fff; line-height: 1.15; }
+  .p2-header h2 em { font-family: 'Source Serif 4', serif; font-weight: 300; font-style: italic; color: var(--peach); }
+  .page-num { font-size: 9px; color: rgba(255,255,255,0.3); font-weight: 500; letter-spacing: 1px; }
+
+  .cost-row {
+    display: grid; grid-template-columns: 150px 1fr 80px;
+    padding: 9px 0; border-bottom: 1px solid rgba(13,27,74,0.06);
+    align-items: start;
+  }
+  .cost-row .cl { font-size: 11px; font-weight: 500; color: var(--navy); }
+  .cost-row .cd { font-size: 10px; color: var(--text-light); line-height: 1.55; font-weight: 400; }
+  .cost-row .ca { font-family: 'Source Serif 4', serif; font-size: 16px; color: var(--navy); text-align: right; }
+  .cost-row.incl .ca { font-family: 'Montserrat', sans-serif; font-size: 9px; color: var(--text-light); font-style: italic; }
+
+  .cost-total {
+    display: grid; grid-template-columns: 150px 1fr 80px;
+    padding: 12px 0 0; border-top: 2px solid var(--navy); margin-top: 2px;
+  }
+  .cost-total .cl { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .cost-total .ca { font-family: 'Source Serif 4', serif; font-size: 24px; color: var(--navy); text-align: right; font-weight: 500; }
+
+  .contact {
+    margin-top: auto; text-align: center; padding-top: 12px;
+    border-top: 1px solid rgba(13,27,74,0.06);
+  }
+  .contact p { font-size: 10px; color: var(--text-light); text-align: center; margin-bottom: 2px; }
+
+  .footer-bar { display: flex; height: 5px; margin-top: auto; }
+  .footer-bar span { flex: 1; }
+  .footer-bar span:nth-child(1) { background: var(--lavender); }
+  .footer-bar span:nth-child(2) { background: var(--pink); }
+  .footer-bar span:nth-child(3) { background: var(--peach); }
+
+  @media print {
+    body { background: none; padding: 0; gap: 0; }
+    .page { box-shadow: none; page-break-after: always; page-break-inside: avoid; height: 297mm; width: 210mm; overflow: hidden; }
+    .page:last-child { page-break-after: auto; }
+  }
+  @page { size: A4; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== PAGE 1 ===== -->
+<div class="page">
+
+  <div class="cover-header">
+    <div class="logo-row">
+      <div class="logo-mark"><span></span><span></span><span></span></div>
+      <div class="logo-text">Story Studio</div>
+    </div>
+    <h1>Scientific Communication <em>Training</em></h1>
+    <p class="subtitle">A 1.5-day intensive programme for the COMMENCE trial</p>
+    <div class="cover-meta">
+      <div><strong>Jonathan McCrea</strong><br>Whipsmart Media</div>
+      <div style="text-align:right;"><span class="for">Prepared for</span><br><span class="ef">Edwards Lifesciences</span></div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="section-title">The Programme</div>
+    <p>Story Studio is an intensive, practice-based communication training programme designed for researchers, clinicians, and industry professionals. We propose a tailored version for <strong>10-12 cardiac surgeons</strong> at Edwards Lifesciences, delivered over <strong>1.5 days in Switzerland</strong>. The programme is built on <strong>evidence-based communication science</strong>, Barbara Minto's <strong>Pyramid Principle</strong>, and the data storytelling methodology of <strong>Cole Nussbaumer Knaflic</strong>.</p>
+
+    <p>Over five sessions, participants learn to structure their science using proven narrative frameworks, present clinical data clearly and persuasively, and deliver with confidence on stage and on camera. Every session includes hands-on exercises, iterative practice, and honest, constructive feedback. By the end of the workshop, each participant will have <strong>presented multiple times</strong>, received detailed individual feedback from the trainer and their peers, and will leave with a proven framework they can apply to any future presentation or communication engagement.</p>
+
+    <div class="section-title">Why This Matters for Edwards</div>
+    <p>With the COMMENCE trial's seminal 10-year data now published, there is a significant opportunity to ensure that the surgeons closest to this evidence can communicate its significance effectively. In our experience, when a scientific expert fails to connect with an audience, it is rarely the expertise or the science that is the issue. <strong>It is the communication.</strong> Surgeons who present their research with clarity and human connection are the ones who get invited back, who build collaborations, and who move their field forward.</p>
+
+    <p>This programme supports Edwards Lifesciences' commitment to <strong>advancing clinical education and evidence dissemination</strong>. We tailor each session to the specific challenges of presenting COMMENCE data, working with a pan-European group of mixed skill levels, and preparing surgeons to represent clinical evidence confidently at international congresses and professional events. We frame communication improvement as a universal life skill, not a competition, which creates a safe and productive learning environment where <strong>every participant improves from their own starting point</strong>.</p>
+
+    <div class="section-title">What Participants Receive</div>
+    <p>All participants receive <strong>12 months' access to the Story Studio Portal</strong>, an AI-powered communication toolkit trained on the Story Studio methodology for analysing language, creating metaphors, structuring narratives, and building presentation plans. They also receive a course handbook, a structured <strong>Content Tool</strong> template for planning any future presentation, and <strong>30 days of email support</strong> for upcoming presentations or communication opportunities.</p>
+
+    <p>Following the course, Whipsmart Media provides Edwards with a <strong>summary report</strong> identifying participants who showed particular aptitude for communicating clinical evidence, along with recommendations for follow-up activities. We also strongly recommend that Edwards plans a <strong>tangible follow-up activity</strong> for participants shortly after the course, such as a recorded video, an internal panel, or an opportunity to present at an upcoming event. In our experience, this significantly increases the long-term impact of the programme.</p>
+
+  </div>
+
+  <div class="footer-bar"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ===== PAGE 2 ===== -->
+<div class="page">
+
+  <div class="p2-header">
+    <div class="p2-header-row">
+      <div class="logo-mark"><span></span><span></span><span></span></div>
+      <div class="page-num">02</div>
+    </div>
+    <h2>Delivery &amp; <em>Investment</em></h2>
+  </div>
+
+  <div class="body">
+
+    <div class="section-title">About the Trainer</div>
+    <p><strong>Jonathan McCrea</strong> is a <strong>multi-award-winning broadcaster</strong> and founder of Whipsmart Media, Ireland's leading communications consultancy for science and research. He has 13 years' experience training researchers, clinicians, and industry professionals in the art of scientific communication. He is the creator of Futureproof, Newstalk's flagship science programme, which has won <strong>11 national and international radio awards</strong>, and has presented 10 series of Ten Things To Know About on RTE.</p>
+
+    <p>Jonathan has worked extensively in the <strong>medical device and pharmaceutical sectors</strong>, including MSL field training for Pfizer, and has worked with <strong>Edwards Lifesciences previously</strong> at your Limerick facility and in Dublin. He played a key role in the communications and pitch training for the <strong>ARC Hub for HealthTech</strong> at University of Galway, a centre focused on connected health and medical technology innovation. He sits on the board of <strong>Science Media Centre Ireland</strong> and founded the science communications conference SCI:COM.</p>
+
+    <div class="section-title">Programme at a Glance</div>
+    <p>Participants complete pre-work two weeks before: a confidence survey, a lay abstract of their research or COMMENCE data, and 3-5 slides. <strong>Day 1</strong> covers four sessions: Language (how visual, emotional, and logical language transform a clinical message), Story (narrative frameworks and "prisming" COMMENCE data from different stakeholder perspectives), Presenting with Data (Pyramid Principle, slide design, behaviour change framing), and On Camera and Delivery (presence, voice, and a recorded on-camera exercise with individual feedback). <strong>Day 2</strong> (half day, close 12:30) brings it all together: each participant delivers a <strong>full 5-7 minute presentation</strong>, receiving structured peer and trainer feedback and an on-camera recording for personal review.</p>
+
+    <div class="section-title">Logistics</div>
+    <p><strong>Group size:</strong> 10-12 participants. <strong>Location:</strong> Edwards Lifesciences headquarters, Switzerland. <strong>Timing:</strong> Early summer 2026, to be confirmed. A 1-hour briefing call will be held in advance to align on objectives, discuss compliance considerations, and finalise the agenda. The training is entirely educational in nature and does not promote or reference specific products.</p>
+
+    <div class="section-title">Investment</div>
+    <div style="margin-top:4px;">
+      <div class="cost-row">
+        <div class="cl">Programme Design</div>
+        <div class="cd">Pre-training consultation, briefing call, material customisation, and compliance review coordination</div>
+        <div class="ca">&euro;1,000</div>
+      </div>
+      <div class="cost-row">
+        <div class="cl">Training Delivery</div>
+        <div class="cd">1.5-day workshop (3 half-day sessions x &euro;4,500)</div>
+        <div class="ca">&euro;13,500</div>
+      </div>
+      <div class="cost-row incl">
+        <div class="cl">Portal Access</div>
+        <div class="cd">12 licences, 12 months (valued at &euro;200/participant)</div>
+        <div class="ca">Included</div>
+      </div>
+      <div class="cost-total">
+        <div class="cl">Total</div>
+        <div></div>
+        <div class="ca">&euro;14,500</div>
+      </div>
+    </div>
+
+    <p style="font-size:9.5px;color:var(--text-light);margin-top:8px;">Travel and expenses (flights, accommodation, local transport) billed separately at cost. VAT is not applicable (services supplied outside the EU). Payment: 25% on signing of contract, 75% upon completion. This proposal is valid for 60 days from the date of issue.</p>
+
+    <div class="contact">
+      <p style="font-weight:500;color:var(--navy);">Jonathan McCrea | Whipsmart Media</p>
+      <p>jonathan@whipsmartmedia.com &bull; +353 1 554 9770 &bull; whipsmartmedia.com &bull; storystudiocourse.com</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bar"><span></span><span></span><span></span></div>
+</div>
+
+</body>
+</html>

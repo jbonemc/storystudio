@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Studio — Social Media & Science Communication Slides</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap');
+
+  :root {
+    --navy: #0D1B4A;
+    --lavender: #C4B3D4;
+    --pink: #E8B4C8;
+    --peach: #F2C4A8;
+    --cream: #FAF8F5;
+    --text: #2D2D2D;
+    --text-light: #6B6B6B;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #d5d2cd;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 40px 20px;
+  }
+
+  /* 16:9 slide */
+  .slide {
+    width: 960px;
+    height: 540px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    page-break-after: always;
+  }
+
+  /* ===== SLIDE 1: Five Principles ===== */
+  .slide-1 {
+    background: var(--navy);
+    display: flex;
+  }
+
+  .slide-1 .left-col {
+    width: 380px;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .slide-1 .left-col::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 60px;
+    bottom: 60px;
+    width: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .slide-1 .logo-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .logo-marks {
+    display: flex;
+    gap: 4px;
+  }
+
+  .logo-marks span {
+    width: 14px;
+    height: 18px;
+    border-radius: 2px;
+    transform: skewX(-6deg);
+  }
+
+  .logo-marks span:nth-child(1) { background: var(--lavender); }
+  .logo-marks span:nth-child(2) { background: var(--pink); }
+  .logo-marks span:nth-child(3) { background: var(--peach); }
+
+  .logo-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .slide-1 h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .slide-1 h1 em {
+    color: var(--peach);
+    font-style: italic;
+  }
+
+  .slide-1 .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .slide-1 .right-col {
+    flex: 1;
+    padding: 36px 40px 36px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .principle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .principle-row:last-child { border-bottom: none; }
+
+  .principle-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .principle-row:nth-child(1) .principle-num { background: var(--lavender); color: var(--navy); }
+  .principle-row:nth-child(2) .principle-num { background: var(--pink); color: var(--navy); }
+  .principle-row:nth-child(3) .principle-num { background: var(--peach); color: var(--navy); }
+  .principle-row:nth-child(4) .principle-num { background: var(--lavender); color: var(--navy); }
+  .principle-row:nth-child(5) .principle-num { background: var(--pink); color: var(--navy); }
+
+  .principle-text h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+
+  .principle-text p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+  }
+
+  /* ===== SLIDE 2: Platform Grid ===== */
+  .slide-2 {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slide-2-header {
+    background: var(--navy);
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .slide-2-header h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  .slide-2-header h2 em {
+    color: var(--peach);
+    font-style: italic;
+  }
+
+  .slide-2-body {
+    flex: 1;
+    padding: 24px 48px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    flex: 1;
+  }
+
+  .platform-card {
+    border-radius: 8px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .platform-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .platform-card h4 .plat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+
+  .platform-card .best-for {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .platform-card p {
+    font-size: 10.5px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .platform-card p strong {
+    color: var(--navy);
+  }
+
+  .pc-lav { background: rgba(196,179,212,0.12); }
+  .pc-pnk { background: rgba(232,180,200,0.12); }
+  .pc-pch { background: rgba(242,196,168,0.12); }
+
+  .pc-lav .plat-dot { background: var(--lavender); }
+  .pc-pnk .plat-dot { background: var(--pink); }
+  .pc-pch .plat-dot { background: var(--peach); }
+
+  .slide-2-footer {
+    padding-top: 12px;
+    border-top: 1px solid rgba(13,27,74,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .slide-2-footer .takeaway {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  .slide-2-footer .page-ref {
+    font-size: 9px;
+    color: var(--text-light);
+  }
+
+  /* ===== SLIDE 3: Workflow ===== */
+  .slide-3 {
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slide-3-header {
+    background: var(--navy);
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .slide-3-header h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  .slide-3-header h2 em {
+    color: var(--peach);
+    font-style: italic;
+  }
+
+  .slide-3-body {
+    flex: 1;
+    padding: 28px 48px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Workflow steps as a horizontal flow */
+  .workflow-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .wf-step {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .wf-step::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid var(--navy);
+    opacity: 0.15;
+  }
+
+  .wf-step:last-child::after { display: none; }
+
+  .wf-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .wf-step:nth-child(1) .wf-num { background: var(--lavender); color: var(--navy); }
+  .wf-step:nth-child(2) .wf-num { background: var(--lavender); color: var(--navy); }
+  .wf-step:nth-child(3) .wf-num { background: var(--pink); color: var(--navy); }
+  .wf-step:nth-child(4) .wf-num { background: var(--pink); color: var(--navy); }
+  .wf-step:nth-child(5) .wf-num { background: var(--peach); color: var(--navy); }
+  .wf-step:nth-child(6) .wf-num { background: var(--peach); color: var(--navy); }
+
+  .wf-step h5 {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .wf-step p {
+    font-size: 9px;
+    color: var(--text-light);
+    line-height: 1.4;
+  }
+
+  /* Bottom section: two columns */
+  .slide-3-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .checklist-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .checklist-box h4 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid;
+  }
+
+  .checklist-box:first-child h4 { border-color: var(--lavender); }
+  .checklist-box:last-child h4 { border-color: var(--peach); }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 10.5px;
+    color: var(--text);
+    line-height: 1.45;
+  }
+
+  .check-item .tick {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(13,27,74,0.2);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .slide-3-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid rgba(13,27,74,0.08);
+  }
+
+  .slide-3-footer .takeaway {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  .slide-3-footer .page-ref {
+    font-size: 9px;
+    color: var(--text-light);
+  }
+
+  /* ===== TALKING POINTS ===== */
+  .talking-points {
+    width: 960px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px 48px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    page-break-before: always;
+  }
+
+  .talking-points h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    color: var(--navy);
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  .tp-slide {
+    margin-bottom: 28px;
+  }
+
+  .tp-slide:last-child { margin-bottom: 0; }
+
+  .tp-slide h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tp-slide h3 .tp-badge {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .tp-badge.b-lav { background: rgba(196,179,212,0.2); color: #7B6A8E; }
+  .tp-badge.b-pnk { background: rgba(232,180,200,0.2); color: #A06B82; }
+  .tp-badge.b-pch { background: rgba(242,196,168,0.2); color: #A07050; }
+
+  .tp-slide ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .tp-slide ul li {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 5px 0 5px 18px;
+    position: relative;
+  }
+
+  .tp-slide ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 8px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .tp-slide:nth-child(1) ul li::before { background: var(--lavender); }
+  .tp-slide:nth-child(2) ul li::before { background: var(--pink); }
+  .tp-slide:nth-child(3) ul li::before { background: var(--peach); }
+
+  .tp-slide ul li strong {
+    color: var(--navy);
+  }
+
+  .design-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  @media print {
+    body { background: none; padding: 0; gap: 0; }
+    .slide, .talking-points { box-shadow: none; }
+    .design-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="design-label">Slide 1 of 3</div>
+
+<!-- ===== SLIDE 1: Five Principles ===== -->
+<div class="slide slide-1">
+  <div class="left-col">
+    <div class="logo-bar">
+      <div class="logo-marks"><span></span><span></span><span></span></div>
+      <div class="logo-label">Story Studio</div>
+    </div>
+    <h1>Five Principles of <em>Science Communication</em> Online</h1>
+    <p class="subtitle">What the evidence actually says about communicating research on social media.</p>
+  </div>
+  <div class="right-col">
+    <div class="principle-row">
+      <div class="principle-num">1</div>
+      <div class="principle-text">
+        <h3>Clarity Beats Density</h3>
+        <p>One main message, everyday language, active voice. If the board of a major congress can't follow their own keynote, your audience won't either.</p>
+      </div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-num">2</div>
+      <div class="principle-text">
+        <h3>Visuals Must Clarify, Not Decorate</h3>
+        <p>Infographics increase reach, but only when they do real explanatory work. A pretty graphic that hides caveats is worse than no graphic.</p>
+      </div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-num">3</div>
+      <div class="principle-text">
+        <h3>Narrative Structure Matters</h3>
+        <p>Why does this matter? What was done? What should the audience take away? Three questions, answered quickly, every time.</p>
+      </div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-num">4</div>
+      <div class="principle-text">
+        <h3>Trust Comes From Cues</h3>
+        <p>Show expertise, link to the source, name the study type, explain limits, and welcome questions. If you don't supply context, audiences infer it from weaker signals.</p>
+      </div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-num">5</div>
+      <div class="principle-text">
+        <h3>Uncertainty Needs Design, Not Avoidance</h3>
+        <p>Uncertain messages get shared less, but transparency builds trust. State the uncertainty, translate it, pair it with what it means for action now.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="design-label">Slide 2 of 3</div>
+
+<!-- ===== SLIDE 2: Platform Grid ===== -->
+<div class="slide slide-2">
+  <div class="slide-2-header">
+    <div class="logo-bar" style="margin-bottom:0;">
+      <div class="logo-marks"><span></span><span></span><span></span></div>
+      <div class="logo-label" style="color:rgba(255,255,255,0.35);">Story Studio</div>
+    </div>
+    <h2>Match the Message to the <em>Platform</em></h2>
+  </div>
+  <div class="slide-2-body">
+    <div class="platform-grid">
+      <div class="platform-card pc-lav">
+        <h4><span class="plat-dot"></span>X / Threads</h4>
+        <div class="best-for">Real-time conversation</div>
+        <p>Lead with the finding, add method and limits in-thread. Use for <strong>paper launches, conference commentary, rapid expert exchange</strong>. Threads for lighter-weight, text-first updates.</p>
+      </div>
+      <div class="platform-card pc-pnk">
+        <h4><span class="plat-dot"></span>LinkedIn</h4>
+        <div class="best-for">Professional impact</div>
+        <p>Explain <strong>why the work matters for practice, policy, or teaching</strong>. Strong opening paragraph, one clear takeaway. Build recurring series via newsletters. Reaches funders and collaborators.</p>
+      </div>
+      <div class="platform-card pc-pch">
+        <h4><span class="plat-dot"></span>Instagram</h4>
+        <div class="best-for">Visual explanation</div>
+        <p><strong>Carousels: one slide, one idea.</strong> Reels for hooks plus one concept. Great for broadening audience beyond academia. Always add captions and alt text.</p>
+      </div>
+      <div class="platform-card pc-lav">
+        <h4><span class="plat-dot"></span>TikTok</h4>
+        <div class="best-for">Younger audiences</div>
+        <p>Open with <strong>the question or the misconception</strong>. Answer one point only. Use comments to source future content. Interactive, need-led formats maintain scientific integrity.</p>
+      </div>
+      <div class="platform-card pc-pnk">
+        <h4><span class="plat-dot"></span>YouTube</h4>
+        <div class="best-for">Durable depth</div>
+        <p><strong>Shorts for discovery, long-form for depth.</strong> Structure around audience questions. Invest in titles and thumbnails without clickbait. Caption everything.</p>
+      </div>
+      <div class="platform-card pc-pch">
+        <h4><span class="plat-dot"></span>Facebook</h4>
+        <div class="best-for">Communities & mixed-age</div>
+        <p>Pages for outward communication, <strong>Groups for community dialogue</strong> or course cohorts. Still essential where local relevance, events, or older audiences matter.</p>
+      </div>
+    </div>
+    <div class="slide-2-footer">
+      <div class="takeaway">"The mistake is not using the wrong platform once. It is forcing all communication into a single platform logic."</div>
+      <div class="page-ref">storystudiocourse.com</div>
+    </div>
+  </div>
+</div>
+
+<div class="design-label">Slide 3 of 3</div>
+
+<!-- ===== SLIDE 3: Workflow ===== -->
+<div class="slide slide-3">
+  <div class="slide-3-header">
+    <div class="logo-bar" style="margin-bottom:0;">
+      <div class="logo-marks"><span></span><span></span><span></span></div>
+      <div class="logo-label" style="color:rgba(255,255,255,0.35);">Story Studio</div>
+    </div>
+    <h2>From Paper to <em>Post</em></h2>
+  </div>
+  <div class="slide-3-body">
+    <div class="workflow-flow">
+      <div class="wf-step">
+        <div class="wf-num">1</div>
+        <h5>Set Your Goal</h5>
+        <p>Awareness? Understanding? Recruitment? Behaviour change?</p>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">2</div>
+        <h5>Define Audience</h5>
+        <p>Who specifically? What do they already know?</p>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">3</div>
+        <h5>Choose Platform</h5>
+        <p>Match the format to where your audience lives.</p>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">4</div>
+        <h5>Draft One Message</h5>
+        <p>One take-home point. Add method, limits, source link.</p>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">5</div>
+        <h5>Accessibility Pass</h5>
+        <p>Alt text, captions, contrast. If it doesn't work on mute, it's not ready.</p>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">6</div>
+        <h5>Publish & Measure</h5>
+        <p>Track against your goal, not vanity metrics.</p>
+      </div>
+    </div>
+
+    <div class="slide-3-bottom">
+      <div class="checklist-box">
+        <h4>Before You Post</h4>
+        <div class="check-item"><div class="tick"></div>Is there <strong>one clear main message</strong>?</div>
+        <div class="check-item"><div class="tick"></div>Have I named the <strong>study type and limits</strong>?</div>
+        <div class="check-item"><div class="tick"></div>Is there a <strong>link to the source</strong>?</div>
+        <div class="check-item"><div class="tick"></div>Would a non-specialist <strong>understand this</strong>?</div>
+        <div class="check-item"><div class="tick"></div>Have I added <strong>alt text and captions</strong>?</div>
+      </div>
+      <div class="checklist-box">
+        <h4>Common Mistakes</h4>
+        <div class="check-item"><div class="tick"></div>Posting for yourself, not a <strong>defined audience</strong></div>
+        <div class="check-item"><div class="tick"></div>Cross-posting <strong>identical content</strong> everywhere</div>
+        <div class="check-item"><div class="tick"></div>Optimising for visibility but <strong>hiding caveats</strong></div>
+        <div class="check-item"><div class="tick"></div>No <strong>call to action</strong> — what should they do next?</div>
+        <div class="check-item"><div class="tick"></div>Measuring <strong>likes, not understanding</strong></div>
+      </div>
+    </div>
+
+    <div class="slide-3-footer">
+      <div class="takeaway">"Treat social posts as a constrained form of scholarly translation: audience-first, source-linked, and revisable."</div>
+      <div class="page-ref">storystudiocourse.com</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TALKING POINTS ===== -->
+<div class="talking-points">
+  <h2>Talking Points</h2>
+
+  <div class="tp-slide">
+    <h3><span class="tp-badge b-lav">Slide 1</span> Five Principles of Science Communication Online</h3>
+    <ul>
+      <li><strong>Open with the UEG anecdote:</strong> "I hosted the main stage at a gastroenterology congress — 10,000 people. After the keynote, I sat with the board. Over two-thirds of them said they didn't understand the presentation. These are experts in the field. If it happens there, it happens on social media ten times faster."</li>
+      <li><strong>Clarity beats density</strong> applies everywhere — social media just compresses the stakes. You have seconds, not minutes. One message. Everyday language. If you can't say it in one sentence, you don't know it well enough yet.</li>
+      <li><strong>Visuals:</strong> Infographics and carousels increase reach, but research shows they can also introduce spin if they skip the caveats. A visual abstract that looks beautiful but says "this drug works" when the study found "no significant difference" is worse than no graphic. The rule is: <strong>visuals should clarify your method and findings, not decorate them.</strong></li>
+      <li><strong>Narrative structure:</strong> This maps directly to what we covered in Session 1. PIP works just as well in a 280-character post — Problem, Inspiration, Payoff. "We asked [problem]. We found [inspiration]. Here's what it means [payoff]."</li>
+      <li><strong>Trust cues:</strong> On social media, if you don't supply context, people infer credibility from aesthetics, follower counts, or whether it "feels right." You can beat that by doing four things: name the study type, link to the paper, state what you don't know, and invite questions.</li>
+      <li><strong>Uncertainty:</strong> This is the hardest one. Research on 2 million tweets found that uncertain messages get shared less. So there's real pressure to strip caveats. But other studies show transparency builds trust. The solution isn't to hide uncertainty — it's to <strong>translate it</strong>. "This is observational, so it shows association, not cause. It still matters because..."</li>
+    </ul>
+  </div>
+
+  <div class="tp-slide">
+    <h3><span class="tp-badge b-pnk">Slide 2</span> Match the Message to the Platform</h3>
+    <ul>
+      <li><strong>The biggest mistake researchers make</strong> isn't choosing the wrong platform — it's forcing all communication into one platform's logic. An X thread, a LinkedIn post, and an Instagram carousel about the same paper should be three different pieces of communication.</li>
+      <li><strong>X and Threads</strong> reward real-time conversation. Lead with the finding. Add method and limits in the thread. Great for conferences — live commentary puts you in front of the people in the room and the thousands who aren't.</li>
+      <li><strong>LinkedIn</strong> is where funders, collaborators, and practitioners live. Don't post your abstract. Tell them <strong>why your work matters for their work</strong>. "If you're a clinician in [area], here's what this means for you." That's the post that gets shared to the right people.</li>
+      <li><strong>Instagram and TikTok</strong> are about visual explanation and one idea at a time. Carousels: one slide, one point. TikTok: open with the question or the misconception, answer one thing, and use comments to source your next video. The TikTok research is clear — interactive, need-led content maintains scientific integrity better than scripted lectures.</li>
+      <li><strong>YouTube</strong> is unique because content is durable. A 10-minute explainer keeps getting views for years. Use Shorts for discovery and longer videos for depth. And caption everything.</li>
+      <li><strong>Facebook</strong> still matters — especially for Groups (course cohorts, local science communities) and mixed-age audiences. It's not fashionable, but if your audience is there, be there.</li>
+      <li><strong>Key question to ask:</strong> "Who am I trying to reach, and where do they already spend time?" Not "which platform am I most comfortable on?"</li>
+    </ul>
+  </div>
+
+  <div class="tp-slide">
+    <h3><span class="tp-badge b-pch">Slide 3</span> From Paper to Post</h3>
+    <ul>
+      <li><strong>This is where the Content Tool connects.</strong> The same thinking applies: what's the behaviour change? Who's in the room? What are my key messages? The only difference is the format is shorter and the audience is scrolling.</li>
+      <li><strong>Walk through the 6-step workflow:</strong> Goal → Audience → Platform → Draft → Accessibility → Measure. This should become habitual. "I should post about this paper" turns into an editorial routine, not an afterthought.</li>
+      <li><strong>"Before You Post" checklist</strong> — five quick questions. If you can't tick all five, it's not ready. The most forgotten ones are: naming the study type, adding alt text, and giving people a link to the source.</li>
+      <li><strong>Common mistakes:</strong> The evidence is consistent — most poor social posts are written for an imaginary "general public" that doesn't exist. Name a primary audience and a secondary audience for every post. "Peers at my next conference" is different from "interested public who saw a headline."</li>
+      <li><strong>Metrics:</strong> Likes and impressions tell you about distribution, not understanding. Saves and shares tell you about utility. Comments tell you whether people understood — or didn't. The right question is: <strong>"Did this post move someone from seeing my work to engaging with it?"</strong></li>
+      <li><strong>Accessibility is not optional:</strong> If your content isn't understandable with sound off, visuals unseen, or on a small screen, it's not ready. Alt text, captions, transcripts — build them in from the start, not as an afterthought.</li>
+      <li><strong>Close with this:</strong> "Treat every social post as a public record of your professional judgement. That's not scary — it's empowering. It means you're building a body of clear, honest, accessible communication that people can find, trust, and share."</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

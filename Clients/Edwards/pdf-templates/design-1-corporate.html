@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Studio Proposal — Design 1: Corporate Clean</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+  :root {
+    --navy: #0D1B4A;
+    --lavender: #C4B3D4;
+    --pink: #E8B4C8;
+    --peach: #F2C4A8;
+    --cream: #FAF8F5;
+    --text: #2D2D2D;
+    --text-light: #6B6B6B;
+    --page-w: 210mm;
+    --page-h: 297mm;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e0ddd8;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .page {
+    width: var(--page-w);
+    min-height: var(--page-h);
+    background: #fff;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    height: var(--page-h);
+  }
+
+  .cover-top {
+    flex: 1;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 65px;
+    position: relative;
+  }
+
+  .cover-top::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 65px;
+    right: 65px;
+    height: 1px;
+    background: rgba(13,27,74,0.1);
+  }
+
+  .logo-mark {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .logo-mark span {
+    width: 28px;
+    height: 36px;
+    border-radius: 3px;
+    transform: skewX(-6deg);
+  }
+
+  .logo-mark span:nth-child(1) { background: var(--lavender); }
+  .logo-mark span:nth-child(2) { background: var(--pink); }
+  .logo-mark span:nth-child(3) { background: var(--peach); }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 56px;
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.15;
+    margin-bottom: 20px;
+    max-width: 420px;
+  }
+
+  .cover-subtitle {
+    font-size: 16px;
+    color: var(--text-light);
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 380px;
+  }
+
+  .cover-bottom {
+    background: var(--navy);
+    padding: 40px 65px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-meta {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .cover-meta strong {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .cover-client {
+    text-align: right;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .cover-client .client-name {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+
+  /* ===== CONTENT PAGE ===== */
+  .content-page {
+    padding: 55px 65px;
+    height: var(--page-h);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(13,27,74,0.08);
+  }
+
+  .page-header .logo-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mini .mini-marks {
+    display: flex;
+    gap: 3px;
+  }
+
+  .logo-mini .mini-marks span {
+    width: 12px;
+    height: 16px;
+    border-radius: 2px;
+    transform: skewX(-6deg);
+  }
+
+  .logo-mini .mini-marks span:nth-child(1) { background: var(--lavender); }
+  .logo-mini .mini-marks span:nth-child(2) { background: var(--pink); }
+  .logo-mini .mini-marks span:nth-child(3) { background: var(--peach); }
+
+  .logo-mini .mini-text {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--navy);
+    text-transform: uppercase;
+  }
+
+  .page-number {
+    font-size: 10px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--lavender);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 28px;
+  }
+
+  .content-body {
+    flex: 1;
+  }
+
+  .content-body p {
+    font-size: 11.5px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .content-body p:first-of-type {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--navy);
+    font-weight: 400;
+  }
+
+  .content-body p strong {
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .highlight-box {
+    background: var(--cream);
+    border-left: 3px solid var(--lavender);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .highlight-box p {
+    font-size: 11.5px !important;
+    line-height: 1.7 !important;
+    color: var(--text) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .content-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 8px;
+  }
+
+  .content-col h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--peach);
+    display: inline-block;
+  }
+
+  .content-col ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .content-col ul li {
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 5px 0 5px 16px;
+    position: relative;
+  }
+
+  .content-col ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 6px;
+    height: 6px;
+    background: var(--peach);
+    border-radius: 50%;
+  }
+
+  .page-footer {
+    padding-top: 20px;
+    border-top: 1px solid rgba(13,27,74,0.08);
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-light);
+  }
+
+  /* ===== COST PAGE ===== */
+  .cost-page {
+    padding: 55px 65px;
+    height: var(--page-h);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cost-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  .cost-table thead th {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    text-align: left;
+    padding: 12px 0;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  .cost-table thead th:last-child {
+    text-align: right;
+  }
+
+  .cost-table tbody td {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(13,27,74,0.06);
+    vertical-align: top;
+  }
+
+  .cost-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: 12px;
+    width: 30%;
+    padding-right: 20px;
+  }
+
+  .cost-table tbody td:nth-child(2) {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.6;
+    width: 50%;
+  }
+
+  .cost-table tbody td:last-child {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+
+  .cost-table tbody tr.included td:last-child {
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  .cost-table tfoot td {
+    padding: 20px 0 0;
+    border-top: 2px solid var(--navy);
+  }
+
+  .cost-table tfoot td:first-child {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .cost-table tfoot td:last-child {
+    text-align: right;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: 'Playfair Display', serif;
+  }
+
+  .cost-notes {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--cream);
+    border-radius: 6px;
+  }
+
+  .cost-notes h4 {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  .cost-notes p {
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .swatches-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding-top: 40px;
+  }
+
+  .swatches-footer span {
+    width: 24px;
+    height: 30px;
+    border-radius: 3px;
+    transform: skewX(-6deg);
+  }
+
+  .swatches-footer span:nth-child(1) { background: var(--lavender); }
+  .swatches-footer span:nth-child(2) { background: var(--pink); }
+  .swatches-footer span:nth-child(3) { background: var(--peach); }
+
+  .design-label {
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 0 0;
+  }
+
+  @media print {
+    body { background: none; padding: 0; gap: 0; }
+    .page { box-shadow: none; }
+    .design-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="design-label">Design 1 — Corporate Clean</div>
+
+<!-- COVER PAGE -->
+<div class="page cover">
+  <div class="cover-top">
+    <div class="logo-mark">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="logo-text">Story Studio</div>
+
+    <h1 class="cover-title">Scientific Communication Training Proposal</h1>
+    <p class="cover-subtitle">An intensive programme to enhance the presentation and communication skills of emerging surgical leaders at Edwards Lifesciences.</p>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-meta">
+      <strong>Jonathan McCrea</strong><br>
+      Whipsmart Media<br>
+      jonathan@whipsmartmedia.com<br>
+      +353 1 554 9770
+    </div>
+    <div class="cover-client">
+      Prepared for<br>
+      <div class="client-name">Edwards Lifesciences</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT PAGE: INTRODUCTION -->
+<div class="page content-page">
+  <div class="page-header">
+    <div class="logo-mini">
+      <div class="mini-marks"><span></span><span></span><span></span></div>
+      <div class="mini-text">Story Studio</div>
+    </div>
+    <div class="page-number">02</div>
+  </div>
+
+  <div class="content-body">
+    <div class="section-label">Introduction</div>
+    <h2 class="section-title">Why Scientific Communication Matters</h2>
+
+    <p>Edwards Lifesciences is looking to enhance the scientific communication skills of its emerging surgical leaders &mdash; enabling them to present research with clarity, confidence, and presence at international conferences and professional events.</p>
+
+    <p>At Whipsmart Media, <strong>we understand this unique challenge</strong> &mdash; we have been helping researchers and clinicians to communicate their science for the past 17 years. Story Studio is a programme based on evidence-based communication science, 23 years of media experience and 15 years of professional training, shaped by the feedback of hundreds of participants.</p>
+
+    <div class="highlight-box">
+      <p>At a major European gastroenterology congress, after the keynote &mdash; delivered by a world-leading researcher &mdash; over two-thirds of the board members admitted they did not fully understand the presentation. The issue is rarely the science. It is the communication.</p>
+    </div>
+
+    <p>We have extensive experience working with the medical device and pharmaceutical sectors, including MSL training, pitch development, and spokesperson preparation. Importantly, we have worked with Edwards Lifesciences previously, providing communications training at your Limerick facility.</p>
+
+    <div class="content-columns">
+      <div class="content-col">
+        <h4>Core Approach</h4>
+        <ul>
+          <li>Evidence-based Pyramid Principle framework</li>
+          <li>Practical, iterative presentation exercises</li>
+          <li>Constructive peer and trainer feedback</li>
+          <li>On-camera confidence building</li>
+          <li>AI-powered post-training tools</li>
+        </ul>
+      </div>
+      <div class="content-col">
+        <h4>Industry Experience</h4>
+        <ul>
+          <li>Pfizer &mdash; MSL field training</li>
+          <li>Johnson &amp; Johnson</li>
+          <li>Novartis, Abbott, MSD</li>
+          <li>RCSI, University of Galway</li>
+          <li>BioInnovate Ireland</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Whipsmart Media &bull; Confidential</span>
+    <span>Story Studio for Edwards Lifesciences</span>
+  </div>
+</div>
+
+<!-- COST PAGE -->
+<div class="page cost-page">
+  <div class="page-header">
+    <div class="logo-mini">
+      <div class="mini-marks"><span></span><span></span><span></span></div>
+      <div class="mini-text">Story Studio</div>
+    </div>
+    <div class="page-number">08</div>
+  </div>
+
+  <div class="content-body">
+    <div class="section-label">Investment</div>
+    <h2 class="section-title">Cost Breakdown</h2>
+
+    <table class="cost-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Description</th>
+          <th>Cost (EUR)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Preparation &amp; Consultation</td>
+          <td>Pre-training consultation, briefing call, material customisation, pre-course survey design, compliance review coordination, and post-training reporting</td>
+          <td>&euro;4,500</td>
+        </tr>
+        <tr>
+          <td>Training Delivery</td>
+          <td>1.5-day intensive workshop (5 sessions), delivered in-person at Edwards Lifesciences, Switzerland</td>
+          <td>&euro;14,000</td>
+        </tr>
+        <tr class="included">
+          <td>Story Studio Portal</td>
+          <td>12 participant licences for the online AI-powered communication toolkit, course materials, and 30-day post-training email support</td>
+          <td>Included</td>
+        </tr>
+        <tr>
+          <td>Travel &amp; Expenses</td>
+          <td>Return flights (Dublin&ndash;Geneva/Zurich), 2 nights accommodation, and local transport</td>
+          <td>&euro;3,000</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total (excl. VAT)</td>
+          <td></td>
+          <td>&euro;21,500</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="cost-notes">
+      <h4>Terms</h4>
+      <p><strong>Payment:</strong> 50% upon acceptance of proposal, 50% upon completion of training.</p>
+      <p><strong>Validity:</strong> This proposal is valid for 60 days from the date of issue.</p>
+      <p><strong>VAT:</strong> VAT will be applied as appropriate based on the jurisdiction of delivery.</p>
+      <p><strong>Cancellation:</strong> Cancellations within 14 days of the scheduled training date are subject to a 50% cancellation fee.</p>
+    </div>
+  </div>
+
+  <div class="swatches-footer">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="page-footer">
+    <span>Whipsmart Media &bull; Confidential</span>
+    <span>Story Studio for Edwards Lifesciences</span>
+  </div>
+</div>
+
+</body>
+</html>

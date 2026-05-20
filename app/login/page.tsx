@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createClient } from "@/lib/supabase/client";
 import { Mail, ArrowRight, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 type Step = "email" | "terms" | "sent" | "denied";
@@ -12,7 +11,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,23 +18,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Check if email is on the allowlist
-      const res = await fetch("/api/auth/check-email", {
+      const res = await fetch("/api/auth/direct-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.toLowerCase().trim() }),
       });
       const data = await res.json();
 
-      if (data.allowed) {
-        if (data.needsTerms) {
-          setStep("terms");
-        } else {
-          await sendMagicLink();
-        }
-      } else {
-        setStep("denied");
+      if (data.success) {
+        window.location.href = "/";
+        return;
       }
+
+      if (data.needsTerms) {
+        setStep("terms");
+        return;
+      }
+
+      if (data.error === "not_found") {
+        setStep("denied");
+        return;
+      }
+
+      setError(data.error || "Something went wrong. Please try again.");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -44,25 +48,25 @@ export default function LoginPage() {
     }
   }
 
-  async function sendMagicLink() {
+  async function directLogin() {
     setLoading(true);
     setError("");
 
     try {
-      const { error: authError } = await supabase.auth.signInWithOtp({
-        email: email.toLowerCase().trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const res = await fetch("/api/auth/direct-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.toLowerCase().trim() }),
       });
+      const data = await res.json();
 
-      if (authError) {
-        setError(authError.message);
+      if (data.success) {
+        window.location.href = "/";
       } else {
-        setStep("sent");
+        setError(data.error || "Login failed. Please try again.");
       }
     } catch {
-      setError("Failed to send login link. Please try again.");
+      setError("Failed to log in. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -76,7 +80,7 @@ export default function LoginPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email.toLowerCase().trim() }),
     });
-    await sendMagicLink();
+    await directLogin();
   }
 
   return (
@@ -239,14 +243,10 @@ export default function LoginPage() {
               >
                 <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
                 <h2 className="text-lg font-semibold text-white mb-2">
-                  Check your email
+                  Logging you in...
                 </h2>
                 <p className="text-white/40 text-sm mb-1">
-                  We&apos;ve sent a login link to
-                </p>
-                <p className="text-white font-medium">{email}</p>
-                <p className="text-white/30 text-xs mt-4">
-                  Check your spam folder if you don&apos;t see it within a minute.
+                  Redirecting now.
                 </p>
               </motion.div>
             )}

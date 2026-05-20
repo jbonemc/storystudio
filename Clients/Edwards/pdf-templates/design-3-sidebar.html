@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Studio Proposal — Design 3: Accent Sidebar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&display=swap');
+
+  :root {
+    --navy: #0D1B4A;
+    --lavender: #C4B3D4;
+    --pink: #E8B4C8;
+    --peach: #F2C4A8;
+    --cream: #FAF8F5;
+    --text: #2D2D2D;
+    --text-light: #6B6B6B;
+    --page-w: 210mm;
+    --page-h: 297mm;
+    --sidebar-w: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e0ddd8;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .page {
+    width: var(--page-w);
+    min-height: var(--page-h);
+    background: #fff;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover {
+    height: var(--page-h);
+    display: flex;
+  }
+
+  .cover-sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+    position: relative;
+  }
+
+  .cover-sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 200px;
+    background: linear-gradient(to bottom, var(--lavender), var(--pink), var(--peach));
+    border-radius: 1px;
+  }
+
+  .cover-sidebar .sidebar-marks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cover-sidebar .sidebar-marks span {
+    width: 18px;
+    height: 22px;
+    border-radius: 2px;
+    transform: skewX(-6deg);
+  }
+
+  .cover-sidebar .sidebar-marks span:nth-child(1) { background: var(--lavender); }
+  .cover-sidebar .sidebar-marks span:nth-child(2) { background: var(--pink); }
+  .cover-sidebar .sidebar-marks span:nth-child(3) { background: var(--peach); }
+
+  .cover-main {
+    flex: 1;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 56px 60px 48px;
+    position: relative;
+  }
+
+  .cover-main .logo-text {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 60px;
+    opacity: 0.5;
+  }
+
+  .cover-main h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .cover-main h1 .accent {
+    display: block;
+    position: relative;
+  }
+
+  .cover-main h1 .accent::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: var(--peach);
+    opacity: 0.4;
+    z-index: -1;
+  }
+
+  .cover-sep {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .cover-sep span {
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .cover-sep span:nth-child(1) { background: var(--lavender); }
+  .cover-sep span:nth-child(2) { background: var(--pink); }
+  .cover-sep span:nth-child(3) { background: var(--peach); }
+
+  .cover-main .subtitle {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.65;
+    max-width: 380px;
+    margin-bottom: 60px;
+  }
+
+  .cover-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(13,27,74,0.1);
+  }
+
+  .cover-meta-item label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .cover-meta-item span {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  /* ===== CONTENT PAGE ===== */
+  .content-page {
+    height: var(--page-h);
+    display: flex;
+  }
+
+  .page-sidebar {
+    width: var(--sidebar-w);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-sidebar .gradient-strip {
+    width: 4px;
+    flex: 1;
+    border-radius: 2px;
+    margin: 30px 0;
+  }
+
+  .gradient-strip.lav { background: linear-gradient(to bottom, var(--lavender), rgba(196,179,212,0.15)); }
+  .gradient-strip.pnk { background: linear-gradient(to bottom, var(--pink), rgba(232,180,200,0.15)); }
+  .gradient-strip.pch { background: linear-gradient(to bottom, var(--peach), rgba(242,196,168,0.15)); }
+
+  .page-sidebar .page-num-vert {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 2px;
+    padding-bottom: 30px;
+  }
+
+  .page-main {
+    flex: 1;
+    padding: 48px 56px 36px 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .page-top-bar .mini-marks {
+    display: flex;
+    gap: 3px;
+  }
+
+  .page-top-bar .mini-marks span {
+    width: 10px;
+    height: 13px;
+    border-radius: 2px;
+    transform: skewX(-6deg);
+  }
+
+  .page-top-bar .mini-marks span:nth-child(1) { background: var(--lavender); }
+  .page-top-bar .mini-marks span:nth-child(2) { background: var(--pink); }
+  .page-top-bar .mini-marks span:nth-child(3) { background: var(--peach); }
+
+  .page-top-bar .mini-logo {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--navy);
+    text-transform: uppercase;
+    opacity: 0.4;
+  }
+
+  .section-chip {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .chip-lavender { background: rgba(196,179,212,0.2); color: #7B6A8E; }
+  .chip-pink { background: rgba(232,180,200,0.2); color: #A06B82; }
+  .chip-peach { background: rgba(242,196,168,0.2); color: #A07050; }
+
+  .section-heading {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 24px;
+    letter-spacing: -0.3px;
+  }
+
+  .page-main .lead-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--navy);
+    margin-bottom: 18px;
+    font-weight: 400;
+  }
+
+  .page-main p {
+    font-size: 10.5px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .page-main p strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .callout-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--lavender), var(--pink), var(--peach));
+  }
+
+  .callout-card p {
+    font-size: 11px !important;
+    font-style: italic;
+    color: var(--navy) !important;
+    line-height: 1.65 !important;
+    margin: 0 !important;
+    padding-left: 12px;
+  }
+
+  .capabilities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .cap-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: var(--cream);
+    font-size: 10.5px;
+    color: var(--text);
+  }
+
+  .cap-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    transform: rotate(45deg);
+  }
+
+  .cap-dot.c1 { background: var(--lavender); }
+  .cap-dot.c2 { background: var(--pink); }
+  .cap-dot.c3 { background: var(--peach); }
+
+  .page-bottom {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(13,27,74,0.06);
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.5px;
+    color: var(--text-light);
+  }
+
+  /* ===== COST PAGE ===== */
+  .cost-content {
+    flex: 1;
+    padding: 48px 56px 36px 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cost-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+  }
+
+  .cost-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(13,27,74,0.06);
+    gap: 20px;
+  }
+
+  .cost-item:first-child {
+    padding-top: 0;
+  }
+
+  .cost-item-left h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .cost-item-left p {
+    font-size: 10px !important;
+    line-height: 1.55 !important;
+    color: var(--text-light) !important;
+    margin: 0 !important;
+  }
+
+  .cost-item-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .cost-price {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+
+  .cost-item.included .cost-price {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .cost-total-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    padding: 20px 24px;
+    background: var(--navy);
+    border-radius: 8px;
+  }
+
+  .cost-total-bar .total-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .cost-total-bar .total-amount {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .terms-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .term-card {
+    border: 1px solid rgba(13,27,74,0.08);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+
+  .term-card h5 {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .term-card h5 .term-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .term-card p {
+    font-size: 10px !important;
+    line-height: 1.55 !important;
+    color: var(--text-light) !important;
+    margin: 0 !important;
+  }
+
+  .design-label {
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 0 0;
+  }
+
+  @media print {
+    body { background: none; padding: 0; gap: 0; }
+    .page { box-shadow: none; }
+    .design-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="design-label">Design 3 — Accent Sidebar</div>
+
+<!-- COVER PAGE -->
+<div class="page cover">
+  <div class="cover-sidebar">
+    <div class="sidebar-marks">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+  <div class="cover-main">
+    <div class="logo-text">Story Studio</div>
+
+    <h1>Scientific Communication <span class="accent">Training</span></h1>
+
+    <div class="cover-sep">
+      <span></span><span></span><span></span>
+    </div>
+
+    <p class="subtitle">An intensive programme to enhance the presentation and communication skills of emerging surgical leaders at Edwards Lifesciences.</p>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta-item">
+        <label>Prepared by</label>
+        <span>Jonathan McCrea</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Prepared for</label>
+        <span>Edwards Lifesciences</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Company</label>
+        <span>Whipsmart Media</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Contact</label>
+        <span>jonathan@whipsmartmedia.com</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT PAGE -->
+<div class="page content-page">
+  <div class="page-sidebar">
+    <div class="gradient-strip lav"></div>
+    <div class="page-num-vert">02</div>
+  </div>
+  <div class="page-main">
+    <div class="page-top-bar">
+      <div class="mini-marks"><span></span><span></span><span></span></div>
+      <div class="mini-logo">Story Studio</div>
+    </div>
+
+    <span class="section-chip chip-lavender">Introduction</span>
+    <h2 class="section-heading">Why Scientific Communication Matters</h2>
+
+    <p class="lead-text">Edwards Lifesciences is looking to enhance the scientific communication skills of its emerging surgical leaders &mdash; enabling them to present research with clarity, confidence, and presence.</p>
+
+    <p>At Whipsmart Media, <strong>we understand this unique challenge</strong> &mdash; we have been helping researchers and clinicians to communicate their science for the past 17 years. Story Studio is built on evidence-based communication science and has been shaped by hundreds of participants across industry, academia, and healthcare.</p>
+
+    <div class="callout-card">
+      <p>&ldquo;At a major European congress, over two-thirds of the board admitted they didn't understand the keynote &mdash; in their own field. The issue is rarely the science. It is the communication.&rdquo;</p>
+    </div>
+
+    <p>We have worked with Edwards Lifesciences previously at your Limerick facility. Our programme is built around the <strong>Pyramid Principle</strong> &mdash; ensuring the most important message leads, supported by evidence beneath.</p>
+
+    <div class="capabilities-grid">
+      <div class="cap-item"><span class="cap-dot c1"></span>Pyramid Principle framework</div>
+      <div class="cap-item"><span class="cap-dot c2"></span>Pfizer MSL training</div>
+      <div class="cap-item"><span class="cap-dot c3"></span>Iterative practice &amp; feedback</div>
+      <div class="cap-item"><span class="cap-dot c1"></span>J&amp;J, Novartis, Abbott</div>
+      <div class="cap-item"><span class="cap-dot c2"></span>On-camera confidence</div>
+      <div class="cap-item"><span class="cap-dot c3"></span>RCSI, Galway, BioInnovate</div>
+      <div class="cap-item"><span class="cap-dot c1"></span>AI-powered portal</div>
+      <div class="cap-item"><span class="cap-dot c2"></span>Teagasc &mdash; 5 years</div>
+    </div>
+
+    <div class="page-bottom">
+      <span>Whipsmart Media &bull; Confidential</span>
+      <span>Story Studio for Edwards Lifesciences</span>
+    </div>
+  </div>
+</div>
+
+<!-- COST PAGE -->
+<div class="page content-page">
+  <div class="page-sidebar">
+    <div class="gradient-strip pch"></div>
+    <div class="page-num-vert">08</div>
+  </div>
+  <div class="cost-content">
+    <div class="page-top-bar">
+      <div class="mini-marks"><span></span><span></span><span></span></div>
+      <div class="mini-logo">Story Studio</div>
+    </div>
+
+    <span class="section-chip chip-peach">Investment</span>
+    <h2 class="section-heading">Cost Breakdown</h2>
+
+    <div class="cost-items">
+      <div class="cost-item">
+        <div class="cost-item-left">
+          <h4>Preparation &amp; Consultation</h4>
+          <p>Pre-training consultation, briefing call, material customisation, pre-course survey design, compliance review coordination, and post-training reporting</p>
+        </div>
+        <div class="cost-item-right">
+          <span class="cost-price">&euro;4,500</span>
+        </div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-item-left">
+          <h4>Training Delivery</h4>
+          <p>1.5-day intensive workshop (5 sessions), delivered in-person at Edwards Lifesciences, Switzerland</p>
+        </div>
+        <div class="cost-item-right">
+          <span class="cost-price">&euro;14,000</span>
+        </div>
+      </div>
+      <div class="cost-item included">
+        <div class="cost-item-left">
+          <h4>Story Studio Portal</h4>
+          <p>12 participant licences for the online AI-powered communication toolkit, course materials, and 30-day post-training email support</p>
+        </div>
+        <div class="cost-item-right">
+          <span class="cost-price">Included</span>
+        </div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-item-left">
+          <h4>Travel &amp; Expenses</h4>
+          <p>Return flights (Dublin&ndash;Geneva/Zurich), 2 nights accommodation, and local transport</p>
+        </div>
+        <div class="cost-item-right">
+          <span class="cost-price">&euro;3,000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cost-total-bar">
+      <span class="total-label">Total (excl. VAT)</span>
+      <span class="total-amount">&euro;21,500</span>
+    </div>
+
+    <div class="terms-row">
+      <div class="term-card">
+        <h5><span class="term-dot" style="background:var(--lavender)"></span>Payment</h5>
+        <p>50% upon acceptance of proposal, 50% upon completion of training.</p>
+      </div>
+      <div class="term-card">
+        <h5><span class="term-dot" style="background:var(--pink)"></span>Validity</h5>
+        <p>This proposal is valid for 60 days from the date of issue.</p>
+      </div>
+      <div class="term-card">
+        <h5><span class="term-dot" style="background:var(--peach)"></span>VAT</h5>
+        <p>VAT will be applied as appropriate based on jurisdiction of delivery.</p>
+      </div>
+      <div class="term-card">
+        <h5><span class="term-dot" style="background:var(--lavender)"></span>Cancellation</h5>
+        <p>Cancellations within 14 days of the scheduled date are subject to a 50% fee.</p>
+      </div>
+    </div>
+
+    <div class="page-bottom">
+      <span>Whipsmart Media &bull; Confidential</span>
+      <span>Story Studio for Edwards Lifesciences</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,9 +1,48 @@
 import { createServerClient } from "@supabase/ssr";
+import { jwtVerify } from "jose";
 import { NextResponse, type NextRequest } from "next/server";
+
+const SECRET = new TextEncoder().encode(
+  process.env.PORTAL_SESSION_SECRET || "storystudio-fallback-secret-change-me"
+);
+
+async function checkPortalSession(request: NextRequest): Promise<boolean> {
+  const token = request.cookies.get("portal-session")?.value;
+  if (!token) return false;
+  try {
+    await jwtVerify(token, SECRET);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  // Allow access to login, auth callback, and public assets
+  const isPublicRoute =
+    request.nextUrl.pathname === "/login" ||
+    request.nextUrl.pathname.startsWith("/auth/") ||
+    request.nextUrl.pathname.startsWith("/_next/") ||
+    request.nextUrl.pathname.startsWith("/api/") ||
+    request.nextUrl.pathname === "/favicon.ico";
+
+  if (isPublicRoute) return supabaseResponse;
+
+  // Check portal session cookie first (bypasses Supabase auth / SMTP)
+  const hasPortalSession = await checkPortalSession(request);
+  if (hasPortalSession) {
+    // If on /login with a valid session, redirect to home
+    if (request.nextUrl.pathname === "/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
+  // Fall back to Supabase auth (magic link flow)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -29,15 +68,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Allow access to login, auth callback, and public assets
-  const isPublicRoute =
-    request.nextUrl.pathname === "/login" ||
-    request.nextUrl.pathname.startsWith("/auth/") ||
-    request.nextUrl.pathname.startsWith("/_next/") ||
-    request.nextUrl.pathname.startsWith("/api/") ||
-    request.nextUrl.pathname === "/favicon.ico";
-
-  if (!user && !isPublicRoute) {
+  if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
