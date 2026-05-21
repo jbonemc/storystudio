@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { headers, cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { jwtVerify } from "jose";
+import { rateLimit } from "@/lib/rate-limit";
+
+const PORTAL_SECRET = new TextEncoder().encode(
+  process.env.PORTAL_SESSION_SECRET || "storystudio-fallback-secret-change-me"
+);
 
 // Import mock AI as fallback when no API key is set
 import {
@@ -17,7 +24,7 @@ import {
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 const client = apiKey ? new Anthropic({ apiKey }) : null;
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-5-20250929";
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-6";
 
 // ── System prompt for Story Studio ──────────────────────────────────────────
 const SYSTEM_PROMPT = `You are the Story Studio Content Tool — a warm, expert communications coach built on the Story Studio framework by Jonathan McCrea (storystudiocourse.com).
@@ -94,15 +101,34 @@ async function parseJSON<T>(text: string): Promise<T> {
 
 // ── Route handler ────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const hdrs = await headers();
+  const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const { allowed } = rateLimit(ip, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   const body = await req.json();
   const { type, ...params } = body;
 
   // Set request context for logging
   _reqToolType = type;
   try {
-    const supabase = await createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    _reqUserEmail = user?.email || undefined;
+    // Try portal-session cookie first (direct login)
+    const cookieStore = await cookies();
+    const portalToken = cookieStore.get("portal-session")?.value;
+    if (portalToken) {
+      const { payload } = await jwtVerify(portalToken, PORTAL_SECRET);
+      _reqUserEmail = (payload.email as string) || undefined;
+    } else {
+      // Fall back to Supabase auth (magic link login)
+      const supabase = await createServerClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      _reqUserEmail = user?.email || undefined;
+    }
   } catch {
     _reqUserEmail = undefined;
   }
@@ -335,9 +361,9 @@ Respond with JSON: {
         const { story } = params as { story: string };
         const prompt = `You are a storytelling coach. A user has shared a rough story or anecdote. Restructure it into three different narrative frameworks, and provide coaching for each.
 
-1. PIP (Problem-Inspiration-Payoff): Identify the problem/tension, the unique insight or approach, and the positive outcome.
-2. SCR (Setup-Conflict-Resolution): Set the scene, introduce the conflict/tension, then resolve it.
-3. PEP (Past-Event-Present): How things were before, what changed, and where things stand now.
+1. PIP (Problem-Inspiration-Payoff): Identify the problem/tension, the unique insight or approach, and the positive outcome. This is the default framework for most presentations.
+2. SCR (Setup-Conflict-Resolution): Set the scene, introduce the conflict/tension, then resolve it. Best for case studies and stories with a clear obstacle.
+3. PEP (Past-Event-Present): This framework is specifically for when you DON'T have results yet. It's about explaining how things have changed utterly and why you are going in a new direction. The pattern is: "We used to do it like this" (Past), then something seismic happened (Event), "and now we have to do it differently — here's what we're trying and why we think it will work" (Present). Use PEP when adapting to a seismic shift or justifying a new approach before the data is in.
 
 For each framework, write 2-3 sentences per section and a short coaching note (1-2 sentences) about how to deliver it effectively.
 

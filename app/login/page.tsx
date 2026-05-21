@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, ArrowRight, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { Mail, ArrowLeft, ArrowRight, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 type Step = "email" | "terms" | "sent" | "denied";
 
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -18,29 +20,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/direct-login", {
+      // Check if email is on the allowlist
+      const res = await fetch("/api/auth/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.toLowerCase().trim() }),
       });
       const data = await res.json();
 
-      if (data.success) {
-        window.location.href = "/";
-        return;
-      }
-
-      if (data.needsTerms) {
-        setStep("terms");
-        return;
-      }
-
-      if (data.error === "not_found") {
+      if (data.allowed) {
+        if (data.needsTerms) {
+          setStep("terms");
+        } else {
+          await sendMagicLink();
+        }
+      } else {
         setStep("denied");
-        return;
       }
-
-      setError(data.error || "Something went wrong. Please try again.");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -48,25 +44,25 @@ export default function LoginPage() {
     }
   }
 
-  async function directLogin() {
+  async function sendMagicLink() {
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("/api/auth/direct-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.toLowerCase().trim() }),
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email: email.toLowerCase().trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
-      const data = await res.json();
 
-      if (data.success) {
-        window.location.href = "/";
+      if (authError) {
+        setError(authError.message);
       } else {
-        setError(data.error || "Login failed. Please try again.");
+        setStep("sent");
       }
     } catch {
-      setError("Failed to log in. Please try again.");
+      setError("Failed to send login link. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -80,7 +76,7 @@ export default function LoginPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email.toLowerCase().trim() }),
     });
-    await directLogin();
+    await sendMagicLink();
   }
 
   return (
@@ -243,11 +239,21 @@ export default function LoginPage() {
               >
                 <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
                 <h2 className="text-lg font-semibold text-white mb-2">
-                  Logging you in...
+                  Check your email
                 </h2>
                 <p className="text-white/40 text-sm mb-1">
-                  Redirecting now.
+                  We&apos;ve sent a login link to
                 </p>
+                <p className="text-white font-medium">{email}</p>
+                <p className="text-white/30 text-xs mt-4">
+                  Check your spam folder if you don&apos;t see it within a minute.
+                </p>
+                <button
+                  onClick={() => setStep("email")}
+                  className="mt-4 inline-flex items-center gap-1 text-[#C4B3D4] text-sm font-medium hover:underline"
+                >
+                  <ArrowLeft className="w-3 h-3" /> Try again
+                </button>
               </motion.div>
             )}
 
