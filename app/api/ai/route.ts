@@ -24,7 +24,16 @@ import {
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 const client = apiKey ? new Anthropic({ apiKey }) : null;
-const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-6";
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-5-5";
+
+// Sonnet 5.5 runs thinking by default. These calls return short, structured
+// JSON, so thinking only adds latency and tokens, and it competes with
+// max_tokens. "between_tools" is how thinking is turned off on this model.
+// Older models are left alone: they default to no thinking and reject this.
+const THINKING_OFF =
+  CLAUDE_MODEL.startsWith("claude-sonnet-5-5")
+    ? ({ type: "between_tools" } as const)
+    : undefined;
 
 // ── System prompt for Story Studio ──────────────────────────────────────────
 const SYSTEM_PROMPT = `You are the Story Studio Content Tool — a warm, expert communications coach built on the Story Studio framework by Jonathan McCrea (storystudiocourse.com).
@@ -44,9 +53,11 @@ Your tone is warm, encouraging, direct and specific. You coach, you don't lectur
 
 Always respond with valid JSON matching the format requested.`;
 
-// Sonnet 4.5 pricing per million tokens
-const COST_PER_INPUT_MTOK = 3;
-const COST_PER_OUTPUT_MTOK = 15;
+// Pricing per million tokens. Keep these in step with CLAUDE_MODEL above,
+// or the estimated_cost column in usage_log goes quietly wrong.
+// claude-sonnet-5-5: $2 in / $10 out.
+const COST_PER_INPUT_MTOK = 2;
+const COST_PER_OUTPUT_MTOK = 10;
 
 // These are set per-request in the POST handler
 let _reqToolType: string | undefined;
@@ -56,9 +67,13 @@ async function callClaude(prompt: string): Promise<string> {
   if (!client) throw new Error("No API key");
   const msg = await client.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 1024,
+    // 4096, not 1024: prepInterview, structureStory, generateMetaphors and
+    // analyseLanguage all return JSON longer than 1024 tokens, and a truncated
+    // response fails JSON.parse and surfaces as an error to the user.
+    max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: prompt }],
+    ...(THINKING_OFF ? { thinking: THINKING_OFF } : {}),
   });
   const content = msg.content[0];
   if (content.type !== "text") throw new Error("Unexpected response type");
@@ -96,7 +111,48 @@ async function callClaude(prompt: string): Promise<string> {
 async function parseJSON<T>(text: string): Promise<T> {
   // Strip markdown code fences if present
   const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-  return JSON.parse(cleaned) as T;
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch {
+    // The model sometimes adds a line of commentary before or after the JSON.
+    // Pull out the first balanced object or array instead of giving up.
+    const extracted = extractFirstJSON(cleaned);
+    if (extracted === null) throw new Error("No JSON found in model response");
+    return JSON.parse(extracted) as T;
+  }
+}
+
+/** First balanced {...} or [...] in a string, ignoring braces inside strings. */
+function extractFirstJSON(text: string): string | null {
+  const start = text.search(/[{[]/);
+  if (start === -1) return null;
+  const open = text[start];
+  const close = open === "{" ? "}" : "]";
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\" && inString) {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === open) depth++;
+    else if (ch === close) {
+      depth--;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  return null;
 }
 
 // ── Route handler ────────────────────────────────────────────────────────────
