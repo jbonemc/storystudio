@@ -1,10 +1,28 @@
 import { createServerClient } from "@supabase/ssr";
 import { jwtVerify } from "jose";
 import { NextResponse, type NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 const SECRET = new TextEncoder().encode(
   process.env.PORTAL_SESSION_SECRET || "storystudio-fallback-secret-change-me"
 );
+
+const logDb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+async function logMiddleware(event: string, request: NextRequest, details: Record<string, unknown> = {}) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  try {
+    await logDb.from("auth_logs").insert({
+      event,
+      ip,
+      user_agent: request.headers.get("user-agent") || "unknown",
+      details: { path: request.nextUrl.pathname, ...details },
+    });
+  } catch {}
+}
 
 async function checkPortalSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get("portal-session")?.value;
@@ -69,6 +87,10 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    await logMiddleware("middleware:no-session", request, {
+      hasPortalCookie: !!request.cookies.get("portal-session"),
+      supabaseCookies: request.cookies.getAll().map(c => c.name).filter(n => n.startsWith("sb-")),
+    });
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

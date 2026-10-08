@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { Mail, ArrowLeft, ArrowRight, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Mail, ArrowLeft, ArrowRight, XCircle, Loader2, KeyRound } from "lucide-react";
 
-type Step = "email" | "terms" | "sent" | "denied";
+type Step = "email" | "terms" | "code" | "denied";
 
 export default function LoginPage() {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState(["", "", "", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+  const router = useRouter();
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +24,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Check if email is on the allowlist
       const res = await fetch("/api/auth/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,7 +35,7 @@ export default function LoginPage() {
         if (data.needsTerms) {
           setStep("terms");
         } else {
-          await sendMagicLink();
+          await sendOtp();
         }
       } else {
         setStep("denied");
@@ -44,25 +47,24 @@ export default function LoginPage() {
     }
   }
 
-  async function sendMagicLink() {
+  async function sendOtp() {
     setLoading(true);
     setError("");
 
     try {
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase().trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
       });
 
       if (authError) {
         setError(authError.message);
       } else {
-        setStep("sent");
+        setCode(["", "", "", "", "", "", "", ""]);
+        setStep("code");
+        setTimeout(() => inputRefs.current[0]?.focus(), 100);
       }
     } catch {
-      setError("Failed to send login link. Please try again.");
+      setError("Failed to send code. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -70,18 +72,81 @@ export default function LoginPage() {
 
   async function handleAcceptTerms() {
     setLoading(true);
-    // Record terms acceptance
     await fetch("/api/auth/accept-terms", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email.toLowerCase().trim() }),
     });
-    await sendMagicLink();
+    await sendOtp();
+  }
+
+  function handleCodeInput(index: number, value: string) {
+    if (!/^\d*$/.test(value)) return;
+
+    const newCode = [...code];
+
+    if (value.length > 1) {
+      // Handle paste
+      const digits = value.replace(/\D/g, "").slice(0, 8).split("");
+      digits.forEach((d, i) => {
+        if (i + index < 8) newCode[i + index] = d;
+      });
+      setCode(newCode);
+      const nextIndex = Math.min(index + digits.length, 7);
+      inputRefs.current[nextIndex]?.focus();
+
+      if (newCode.every((d) => d !== "")) {
+        verifyCode(newCode.join(""));
+      }
+      return;
+    }
+
+    newCode[index] = value;
+    setCode(newCode);
+
+    if (value && index < 7) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    if (newCode.every((d) => d !== "")) {
+      verifyCode(newCode.join(""));
+    }
+  }
+
+  function handleCodeKeyDown(index: number, e: React.KeyboardEvent) {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  }
+
+  async function verifyCode(token: string) {
+    setLoading(true);
+    setError("");
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: email.toLowerCase().trim(),
+        token,
+        type: "email",
+      });
+
+      if (verifyError) {
+        setError("Invalid or expired code. Please try again.");
+        setCode(["", "", "", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
+        setLoading(false);
+        return;
+      }
+
+      router.push("/");
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center px-4">
-      {/* Background accents */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-[#C4B3D4]/10 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-[#E8B4C8]/10 blur-3xl" />
@@ -94,7 +159,6 @@ export default function LoginPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Logo / Brand */}
         <div className="text-center mb-10">
           <div className="flex justify-center gap-1.5 mb-4">
             <div className="w-6 h-8 rounded-sm bg-[#C4B3D4] -rotate-6" />
@@ -107,7 +171,6 @@ export default function LoginPage() {
           <p className="text-white/40 text-sm mt-1">Participant Portal</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
           <AnimatePresence mode="wait">
             {step === "email" && (
@@ -221,7 +284,7 @@ export default function LoginPage() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      I agree — send me a login link
+                      I agree — continue
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -229,31 +292,73 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            {step === "sent" && (
+            {step === "code" && (
               <motion.div
-                key="sent"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                key="code"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
-                className="text-center py-4"
               >
-                <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                <h2 className="text-lg font-semibold text-white mb-2">
-                  Check your email
-                </h2>
-                <p className="text-white/40 text-sm mb-1">
-                  We&apos;ve sent a login link to
+                <div className="flex items-center gap-2 mb-1">
+                  <KeyRound className="w-5 h-5 text-[#C4B3D4]" />
+                  <h2 className="text-lg font-semibold text-white">
+                    Enter your code
+                  </h2>
+                </div>
+                <p className="text-white/40 text-sm mb-6">
+                  We&apos;ve sent a code to{" "}
+                  <span className="text-white/60">{email}</span>
                 </p>
-                <p className="text-white font-medium">{email}</p>
-                <p className="text-white/30 text-xs mt-4">
+
+                <div className="flex justify-center gap-2 mb-4">
+                  {code.map((digit, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => { inputRefs.current[i] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={i === 0 ? 8 : 1}
+                      value={digit}
+                      onChange={(e) => handleCodeInput(i, e.target.value)}
+                      onKeyDown={(e) => handleCodeKeyDown(i, e)}
+                      className="w-9 h-12 bg-white/5 border border-white/10 rounded-lg text-center text-lg font-mono text-white focus:outline-none focus:border-[#C4B3D4]/50 focus:ring-1 focus:ring-[#C4B3D4]/30 transition-all"
+                    />
+                  ))}
+                </div>
+
+                {error && (
+                  <p className="text-red-400 text-sm mb-4 text-center">{error}</p>
+                )}
+
+                {loading && (
+                  <div className="flex justify-center mb-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#C4B3D4]" />
+                  </div>
+                )}
+
+                <p className="text-white/30 text-xs text-center mb-4">
                   Check your spam folder if you don&apos;t see it within a minute.
                 </p>
-                <button
-                  onClick={() => setStep("email")}
-                  className="mt-4 inline-flex items-center gap-1 text-[#C4B3D4] text-sm font-medium hover:underline"
-                >
-                  <ArrowLeft className="w-3 h-3" /> Try again
-                </button>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      setStep("email");
+                      setError("");
+                    }}
+                    className="inline-flex items-center gap-1 text-[#C4B3D4] text-sm font-medium hover:underline"
+                  >
+                    <ArrowLeft className="w-3 h-3" /> Back
+                  </button>
+                  <button
+                    onClick={() => sendOtp()}
+                    disabled={loading}
+                    className="text-white/40 text-sm hover:text-white/60 transition-colors disabled:opacity-50"
+                  >
+                    Resend code
+                  </button>
+                </div>
               </motion.div>
             )}
 
