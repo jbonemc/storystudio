@@ -18,7 +18,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-navy: #0F1A3E;
+  --color-navy: #0D1B4A;
   --color-navy-light: #1A2755;
   --color-ep1: #C4B3D4;
   --color-ep2: #E8B4C8;
@@ -26,32 +26,64 @@
   --color-ep1-light: #EDE7F3;
   --color-ep2-light: #F9E8F0;
   --color-ep3-light: #FBF0E8;
+
+  /* Shared with the marketing site so the two read as one brand. */
+  --color-cream: #FAF8F5;
+  --color-ink: #0D1B4A;
+  --color-muted-ink: #5B6079;
+  --color-on-navy: #C7CAD9;
+  --color-muted-navy: #9FA4BE;
+
+  --font-head: var(--font-montserrat), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF8F5;
+  --foreground: #0D1B4A;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --primary: #0F1A3E;
+  --card-foreground: #0D1B4A;
+  --primary: #0D1B4A;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --secondary: #FAF8F5;
+  --secondary-foreground: #0D1B4A;
+  --muted: #EDE7F3;
+  --muted-foreground: #5B6079;
   --accent: #EDE7F3;
-  --accent-foreground: #0F1A3E;
+  --accent-foreground: #0D1B4A;
   --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #C4B3D4;
-  --radius: 0.5rem;
+  --border: #EDE7F3;
+  --input: #EDE7F3;
+  --ring: #0D1B4A;
+  --radius: 0.25rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Montserrat 800 caps for headings, per brand system section 04. */
+h1, h2, h3 {
+  font-family: var(--font-head);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-navy);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--color-ep2);
+  color: var(--color-navy);
+}
+
+/* The parallelogram: 11 degrees, always leaning right. */
+.ss-skew {
+  transform: skewX(-11deg);
 }
 
 .scrollbar-hide {
