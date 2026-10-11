@@ -1,0 +1,114 @@
+<!--
+  Story Studio portal sign-in code.
+
+  WHERE THIS GOES
+  Supabase dashboard > Authentication > Emails > "Magic Link" template
+  (that is the template Supabase uses for signInWithOtp). Paste the whole
+  thing into the message body and set the subject to:
+
+      Your Story Studio sign-in code
+
+  {{ .Token }} is the 8 digit code. Do NOT replace it with anything else,
+  and do not add {{ .ConfirmationURL }}: the portal asks people to type the
+  code, so a clickable link would only confuse, and a link would also pin
+  the email to one domain.
+
+  Email clients strip <style> blocks and ignore most modern CSS, so
+  everything here is inline, table-based, and uses web-safe fallbacks.
+  Montserrat and Inter will not load in most clients; the fallbacks are
+  chosen to degrade sensibly.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin:0;padding:0;background:#FAF8F5;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="max-width:520px;background:#FFFFFF;border:2px solid #0D1B4A;">
+
+        <!-- Navy header with the three-swatch mark -->
+        <tr>
+          <td style="background:#0D1B4A;padding:28px 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="14" height="24" style="background:#C4B3D4;font-size:0;line-height:0;">&nbsp;</td>
+                <td width="6" style="font-size:0;line-height:0;">&nbsp;</td>
+                <td width="14" height="24" style="background:#E8B4C8;font-size:0;line-height:0;">&nbsp;</td>
+                <td width="6" style="font-size:0;line-height:0;">&nbsp;</td>
+                <td width="14" height="24" style="background:#F2C4A8;font-size:0;line-height:0;">&nbsp;</td>
+                <td width="14" style="font-size:0;line-height:0;">&nbsp;</td>
+                <td style="font-family:'Montserrat',Helvetica,Arial,sans-serif;font-size:15px;
+                           font-weight:800;letter-spacing:0.12em;color:#FFFFFF;white-space:nowrap;">
+                  STORY STUDIO
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:36px 32px 8px 32px;">
+            <h1 style="margin:0 0 20px 0;font-family:'Montserrat',Helvetica,Arial,sans-serif;
+                       font-size:24px;line-height:1.15;font-weight:800;letter-spacing:0.05em;
+                       color:#0D1B4A;">
+              YOUR SIGN-IN CODE
+            </h1>
+            <p style="margin:0 0 28px 0;font-family:'Inter',Helvetica,Arial,sans-serif;
+                      font-size:17px;line-height:1.6;color:#5B6079;">
+              Enter this code in the portal to sign in.
+            </p>
+          </td>
+        </tr>
+
+        <!-- The code -->
+        <tr>
+          <td style="padding:0 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="background:#F9E8F0;border:2px solid #0D1B4A;">
+              <tr>
+                <td align="center" style="padding:26px 16px;
+                           font-family:'Courier New',Courier,monospace;
+                           font-size:34px;font-weight:700;letter-spacing:0.22em;
+                           color:#0D1B4A;">
+                  {{ .Token }}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:24px 32px 36px 32px;">
+            <p style="margin:0 0 10px 0;font-family:'Inter',Helvetica,Arial,sans-serif;
+                      font-size:15px;line-height:1.6;color:#5B6079;">
+              The code expires in 10 minutes.
+            </p>
+            <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;
+                      font-size:15px;line-height:1.6;color:#5B6079;">
+              If you did not ask to sign in, ignore this email. Nobody can get into
+              your account without the code above.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#FAF8F5;border-top:2px solid #EDE7F3;padding:22px 32px;">
+            <p style="margin:0 0 6px 0;font-family:'Inter',Helvetica,Arial,sans-serif;
+                      font-size:12px;line-height:1.5;letter-spacing:0.14em;color:#5B6079;">
+              STORY STUDIO
+            </p>
+            <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;
+                      font-size:14px;line-height:1.6;color:#5B6079;">
+              A Whipsmart Media programme.
+              <a href="https://storystudio.ie" style="color:#0D1B4A;text-decoration:underline;">storystudio.ie</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
