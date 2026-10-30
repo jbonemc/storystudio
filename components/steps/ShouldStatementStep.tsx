@@ -9,6 +9,7 @@ import { aiGenerateShouldStatements } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, Sparkles, Pencil } from "lucide-react";
 import { toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { planFromState } from "@/lib/plan";
 
 interface Props {
   state: AppState;
@@ -25,7 +26,7 @@ export function ShouldStatementStep({ state, updateState, onNext, onBack }: Prop
   const loadStatements = () => {
     setLoading(true);
     setError(null);
-    aiGenerateShouldStatements(state.documents, state.behaviourChange)
+    aiGenerateShouldStatements(planFromState(state))
       .then((statements) => {
         updateState({ shouldStatements: statements });
       })
@@ -45,7 +46,7 @@ export function ShouldStatementStep({ state, updateState, onNext, onBack }: Prop
       <div>
         <h2 className="text-2xl font-semibold text-[#1F4E79] mb-2">Your Should Statement</h2>
         <p className="text-gray-600 leading-relaxed">
-          A Should Statement names what your work is ultimately fighting for &mdash; in one plain-language
+          A Should Statement names what your work is ultimately fighting for, in one plain-language
           sentence. It opens every talk with purpose and emotion.
         </p>
       </div>

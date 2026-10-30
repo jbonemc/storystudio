@@ -63,18 +63,18 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
           What change do you want to create?
         </h2>
         <p className="text-gray-600 leading-relaxed">
-          Every talk, presentation or pitch has a <strong>North Star</strong> — the one thing
+          Every talk, presentation or pitch has a <strong>North Star</strong>: the one thing
           you want your audience to do or decide differently after hearing you. Get this right,
           and everything else falls into place.
         </p>
       </div>
 
-      {/* Coaching box — always visible */}
+      {/* Coaching box: always visible */}
       <Card className="border-amber-200 bg-amber-50">
         <CardContent className="pt-4 pb-4">
           <p className="text-sm font-medium text-amber-800 mb-2">Three questions to find your North Star:</p>
           <ul className="text-sm text-amber-700 space-y-1">
-            <li>→ <strong>Who</strong> is the most important person in the room — the one whose decision matters most?</li>
+            <li>→ <strong>Who</strong> is the most important person in the room, the one whose decision matters most?</li>
             <li>→ <strong>What</strong> would you want them to do, approve, fund, adopt, or change?</li>
             <li>→ <strong>When?</strong> What would success look like in the next six months?</li>
           </ul>
@@ -107,7 +107,7 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
                 </p>
                 <p className="text-sm text-orange-700">
                   Once people are aware, what should they actually <em>do</em>? Think about 
-                  the most important person in your audience — what would you want them to 
+                  the most important person in your audience. What would you want them to 
                   decide, fund, adopt, share, or change? That&apos;s your real behaviour change.
                 </p>
               </div>
@@ -139,7 +139,7 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
                   Based on your project, here are five different types of change you could aim for.
                 </p>
                 <p className="text-sm text-gray-500 mb-3">
-                  Click one to use it as a starting point — then make it your own.
+                  Click one to use it as a starting point, then make it your own.
                 </p>
                 <div className="space-y-2">
                   {suggestions.map((s, i) => (
@@ -171,7 +171,7 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
           disabled={state.behaviourChange.trim().length < 10}
           className="bg-[#1F4E79] hover:bg-[#163a5c] text-white gap-2"
         >
-          Next: Should Statement <ArrowRight className="w-4 h-4" />
+          Next: Who <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

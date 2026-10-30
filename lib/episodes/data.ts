@@ -88,9 +88,17 @@ export const episodes: Episode[] = [
         id: "language-analyser",
         title: "Language Analyser",
         description:
-          "Paste any paragraph and see which parts use Visual, Emotional, or Logical language — with suggestions to strengthen the balance.",
+          "Paste any paragraph and see which parts use Visual, Emotional, or Logical language, with suggestions to strengthen the balance.",
         href: "/episode/1-language/language-analyser",
         icon: "BarChart3",
+      },
+      {
+        id: "opposites",
+        title: "Opposites Device",
+        description:
+          "Tell us how you usually describe your work and get openings that say the opposite of what your audience expects.",
+        href: "/episode/1-language/opposites",
+        icon: "FlipHorizontal",
       },
     ],
     downloads: [
@@ -111,7 +119,7 @@ export const episodes: Episode[] = [
     colourLight: "ep2-light",
     colourCSS: "#E8B4C8",
     description:
-      "A story is not a luxury — it is the most efficient technology humans have ever invented for transferring ideas from one mind to another. In this episode you learn repeatable structures that turn any content into a compelling narrative.",
+      "A story is not a luxury. It is the most efficient technology humans have ever invented for transferring ideas from one mind to another. In this episode you learn repeatable structures that turn any content into a compelling narrative.",
     coreIdeas: [
       {
         title: "Problem - Inspiration - Payoff (PIP)",
@@ -121,7 +129,7 @@ export const episodes: Episode[] = [
       {
         title: "Setup - Conflict - Resolution",
         description:
-          "The classic three-act structure. Set the scene, introduce the tension, then resolve it. The conflict is what makes people keep listening — never skip it.",
+          "The classic three-act structure. Set the scene, introduce the tension, then resolve it. The conflict is what makes people keep listening, so never skip it.",
       },
       {
         title: "Past - Event - Present",
@@ -131,7 +139,7 @@ export const episodes: Episode[] = [
       {
         title: "Suspense",
         description:
-          "Do not give away the ending too early. Build towards the turning point. The audience needs to feel the tension before the resolution — that is what makes a story land.",
+          "Do not give away the ending too early. Build towards the turning point. The audience needs to feel the tension before the resolution. That is what makes a story work.",
       },
       {
         title: "The Opposites Device (in Story)",
@@ -141,7 +149,7 @@ export const episodes: Episode[] = [
       {
         title: "Iteration",
         description:
-          "Tell your story three times. Each telling gets tighter, clearer, and more powerful. The best communicators do not have one version of their story — they have a version they have told a hundred times.",
+          "Tell your story three times. Each telling gets tighter, clearer, and more powerful. The best communicators do not have one version of their story. They have a version they have told a hundred times.",
       },
     ],
     tools: [
@@ -160,6 +168,14 @@ export const episodes: Episode[] = [
           "Describe your work and discover 5+ different perspectives from which to tell its story. See your narrative through the eyes of patients, funders, communities, and more.",
         href: "/episode/2-story/prisming",
         icon: "RefreshCw",
+      },
+      {
+        id: "should-statement",
+        title: "Should Statement Builder",
+        description:
+          "Find the one sentence that says what your work is fighting for, and try it out loud in your introduction.",
+        href: "/episode/2-story/should-statement",
+        icon: "Megaphone",
       },
     ],
     downloads: [
@@ -226,15 +242,31 @@ export const episodes: Episode[] = [
         id: "interview-prep",
         title: "Interview Prep Coach",
         description:
-          "Enter your topic and the interview format. Get likely questions, blocking & bridging responses, and delivery coaching.",
+          "Enter your topic, format and key messages. Get likely questions, blocking and bridging lines and delivery coaching, then practise live with your coach playing the presenter.",
         href: "/episode/3-audience/interview-prep",
         icon: "Mic",
+      },
+      {
+        id: "audience-planner",
+        title: "Audience & Persuasion Planner",
+        description:
+          "Describe the meeting, the people and what you need. Get the barriers to watch, the persuasion that fits and your opening line.",
+        href: "/episode/3-audience/audience-planner",
+        icon: "Compass",
+      },
+      {
+        id: "qa-drill",
+        title: "Q&A Drill",
+        description:
+          "Practise thinking on your feet. Your coach plays the audience, asks the questions you dread and gives feedback on every answer.",
+        href: "/episode/3-audience/qa-drill",
+        icon: "MessagesSquare",
       },
     ],
     downloads: [
       {
         title: "Content Tool (Printable)",
-        description: "The one-page Content Tool template — fill in your 13-item plan by hand.",
+        description: "The one-page Content Tool template: fill in your 13-item plan by hand.",
         href: "/downloads/Content-Tool-Printable.pdf",
         filename: "Content-Tool-Printable.pdf",
       },

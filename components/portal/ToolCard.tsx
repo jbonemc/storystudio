@@ -6,6 +6,10 @@ import {
   RefreshCw,
   Target,
   Mic,
+  FlipHorizontal,
+  Megaphone,
+  Compass,
+  MessagesSquare,
 } from "lucide-react";
 import type { EpisodeTool } from "@/lib/episodes/data";
 
@@ -16,6 +20,10 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   RefreshCw,
   Target,
   Mic,
+  FlipHorizontal,
+  Megaphone,
+  Compass,
+  MessagesSquare,
 };
 
 interface Props {

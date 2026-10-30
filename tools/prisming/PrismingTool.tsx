@@ -8,6 +8,7 @@ import { RefreshCw, ArrowLeft, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { SaveButton } from "@/components/portal/SaveButton";
 
 interface PrismResult {
   stakeholder: string;
@@ -21,6 +22,27 @@ export function PrismingTool() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [error, setError] = useState<AIRequestError | null>(null);
+  const [opening, setOpening] = useState<{ index: number; opening: string; why: string } | null>(null);
+  const [writing, setWriting] = useState(false);
+  const [openingError, setOpeningError] = useState<AIRequestError | null>(null);
+
+  const handleOpening = async (index: number) => {
+    const p = prisms[index];
+    setWriting(true);
+    setOpeningError(null);
+    try {
+      const r = await callAI<{ opening: string; why: string }>("prismOpening", {
+        description: input,
+        stakeholder: p.stakeholder,
+        angle: p.angle,
+      });
+      setOpening({ index, ...r });
+    } catch (err) {
+      setOpeningError(toAIError(err));
+    } finally {
+      setWriting(false);
+    }
+  };
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -29,6 +51,7 @@ export function PrismingTool() {
       const result = await callAI<PrismResult[]>("generatePrisms", { description: input });
       setPrisms(result);
       setSelected(null);
+      setOpening(null);
     } catch (err) {
       setError(toAIError(err));
     } finally {
@@ -57,7 +80,7 @@ export function PrismingTool() {
         <p className="text-sm text-gray-500 leading-relaxed">
           Describe your work or project. The AI will identify different
           stakeholders affected by it and retell your story from each of their
-          perspectives — revealing angles you may not have considered.
+          perspectives, revealing angles you may not have considered.
         </p>
       </div>
 
@@ -125,6 +148,32 @@ export function PrismingTool() {
               )}
             </button>
           ))}
+
+          {selected !== null && prisms[selected] && (
+            <div className="rounded-lg border border-ep2/40 bg-white p-4 space-y-3">
+              <p className="text-sm text-navy">
+                <strong>Tell it from here.</strong> Pick the most interesting person on your list and
+                tell your story from their point of view.
+              </p>
+              <Button onClick={() => handleOpening(selected)} disabled={writing} size="sm" className="bg-navy hover:bg-navy-light text-white gap-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                {writing ? "Writing..." : `Write my opening as ${prisms[selected].stakeholder}`}
+              </Button>
+              {openingError && <AIErrorNotice error={openingError} onRetry={() => handleOpening(selected)} />}
+              {opening?.index === selected && (
+                <div className="space-y-2">
+                  <p className="text-sm text-navy leading-relaxed bg-ep2-light/40 rounded p-3 border border-ep2/20">{opening.opening}</p>
+                  <p className="text-xs text-gray-500">{opening.why}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <SaveButton
+            tool="prism"
+            title={`Prisms: ${input.trim().slice(0, 60)}`}
+            data={{ input: { description: input }, result: prisms, opening: opening ? { stakeholder: prisms[opening.index]?.stakeholder, text: opening.opening } : null }}
+          />
         </div>
       )}
     </div>

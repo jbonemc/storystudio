@@ -8,6 +8,7 @@ import { aiGenerateStatisticAdvice } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, BarChart3, MessageSquare } from "lucide-react";
 import { toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { planFromState } from "@/lib/plan";
 
 interface Props {
   state: AppState;
@@ -31,7 +32,7 @@ export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
     setAiError(null);
     setBusy(index);
     try {
-      const advice = await aiGenerateStatisticAdvice(state.messages[index].statistic, index);
+      const advice = await aiGenerateStatisticAdvice(state.messages[index].statistic, index, planFromState(state));
       const msgs = [...state.messages];
       msgs[index] = { ...msgs[index], statisticAdvice: advice };
       updateState({ messages: msgs });
@@ -55,7 +56,7 @@ export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
 
       <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
         <BarChart3 className="w-4 h-4 inline mr-1 relative -top-0.5" />
-        <strong>Tip:</strong> &ldquo;50% of patients&rdquo; is good. &ldquo;1 in 2 &mdash; meaning if you and your
+        <strong>Tip:</strong> &ldquo;50% of patients&rdquo; is good. &ldquo;1 in 2, meaning if you and your
         colleague both got this diagnosis, one of you would not survive&rdquo; is unforgettable.
       </div>
 

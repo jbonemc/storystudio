@@ -126,7 +126,7 @@ function CoreIdeasSection({ episode }: { episode: Episode }) {
                   {idea.title}
                 </motion.h3>
 
-                {/* Description — always visible but styled differently */}
+                {/* Description: always visible but styled differently */}
                 <AnimatePresence mode="wait">
                   {isActive ? (
                     <motion.p
@@ -185,7 +185,7 @@ export default function EpisodePage() {
 
   return (
     <div className="overflow-hidden">
-      {/* Hero — compact but striking */}
+      {/* Hero: compact but striking */}
       <div className="bg-navy text-white relative overflow-hidden">
         <div
           className={`absolute inset-0 bg-gradient-to-b ${HERO_GRADIENTS[episode.number]}`}
@@ -237,7 +237,7 @@ export default function EpisodePage() {
         </div>
       </div>
 
-      {/* AI Tools — horizontal scroll cards, overlapping the hero */}
+      {/* AI Tools: horizontal scroll cards, overlapping the hero */}
       <div className="relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-8">
           <motion.h2
@@ -285,10 +285,10 @@ export default function EpisodePage() {
         </div>
       </div>
 
-      {/* Core Ideas — interactive accordion cards */}
+      {/* Core Ideas: interactive accordion cards */}
       <CoreIdeasSection episode={episode} />
 
-      {/* Downloads — fade in from bottom */}
+      {/* Downloads: fade in from bottom */}
       <div className="bg-gray-50/50 border-t border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <motion.div

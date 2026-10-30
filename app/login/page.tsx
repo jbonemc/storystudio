@@ -248,7 +248,7 @@ export default function LoginPage() {
                     <strong className="text-white/80">Fair use:</strong> The AI
                     tools are provided to support your ongoing communication
                     development. Usage is expected to remain within reasonable
-                    levels — approximately 50 tool interactions per month.
+                    levels: approximately 50 tool interactions per month.
                     Automated or bulk usage is not permitted.
                   </p>
                   <p>
@@ -284,7 +284,7 @@ export default function LoginPage() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      I agree — continue
+                      I agree, continue
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}

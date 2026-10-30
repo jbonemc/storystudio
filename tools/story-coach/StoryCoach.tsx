@@ -9,12 +9,18 @@ import { BookOpen, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { SaveButton } from "@/components/portal/SaveButton";
 
 interface StoryResult {
   pip: { problem: string; inspiration: string; payoff: string; coaching: string };
   scr: { setup: string; conflict: string; resolution: string; coaching: string };
   pep: { past: string; event: string; present: string; coaching: string };
+  recommended?: "pip" | "scr" | "pep";
+  why?: string;
+  thirtySecond?: string;
 }
+
+const FRAMEWORK_NAMES = { pip: "PIP", scr: "Setup, Conflict, Resolution", pep: "Past, Event, Present" } as const;
 
 export function StoryCoach() {
   const [input, setInput] = useState("");
@@ -109,17 +115,33 @@ export function StoryCoach() {
 
       {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
 
+      {result && result.recommended && FRAMEWORK_NAMES[result.recommended] && (
+        <Card className="border-ep2/40 bg-ep2-light/40">
+          <CardContent className="pt-4 pb-4 space-y-3">
+            <p className="text-sm text-navy">
+              <strong>Best fit: {FRAMEWORK_NAMES[result.recommended]}.</strong> {result.why}
+            </p>
+            {result.thirtySecond && (
+              <div>
+                <p className="text-xs font-semibold text-navy/60 uppercase tracking-wider mb-1">Your 30-second version</p>
+                <p className="text-sm text-navy leading-relaxed bg-white rounded p-3 border border-ep2/30">{result.thirtySecond}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {result && (
-        <Tabs defaultValue="pip">
+        <Tabs key={result.recommended || "pip"} defaultValue={result.recommended && FRAMEWORK_NAMES[result.recommended] ? result.recommended : "pip"}>
           <TabsList className="grid grid-cols-3 bg-gray-100">
             <TabsTrigger value="pip" className="text-xs data-[state=active]:bg-ep2 data-[state=active]:text-navy">
-              PIP
+              {FRAMEWORK_NAMES.pip}{result.recommended === "pip" ? " (best fit)" : ""}
             </TabsTrigger>
             <TabsTrigger value="scr" className="text-xs data-[state=active]:bg-ep2 data-[state=active]:text-navy">
-              Setup-Conflict-Resolution
+              {FRAMEWORK_NAMES.scr}{result.recommended === "scr" ? " (best fit)" : ""}
             </TabsTrigger>
             <TabsTrigger value="pep" className="text-xs data-[state=active]:bg-ep2 data-[state=active]:text-navy">
-              Past-Event-Present
+              {FRAMEWORK_NAMES.pep}{result.recommended === "pep" ? " (best fit)" : ""}
             </TabsTrigger>
           </TabsList>
 
@@ -156,6 +178,10 @@ export function StoryCoach() {
             )}
           </TabsContent>
         </Tabs>
+      )}
+
+      {result && (
+        <SaveButton tool="story-coach" title={`Story: ${input.trim().slice(0, 60)}`} data={{ input: { story: input }, result }} />
       )}
     </div>
   );

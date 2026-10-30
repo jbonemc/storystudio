@@ -22,6 +22,15 @@ import {
 import Link from "next/link";
 import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { SaveButton } from "@/components/portal/SaveButton";
+
+const AUDIENCES = [
+  { value: "", label: "Anyone" },
+  { value: "public", label: "The public" },
+  { value: "children", label: "Children" },
+  { value: "decision", label: "Decision-makers" },
+  { value: "specialists", label: "Specialists" },
+];
 
 const CONCEPT_TYPES = [
   { value: "", label: "Let the AI figure it out" },
@@ -58,6 +67,23 @@ export function MetaphorGenerator() {
   const [input, setInput] = useState("");
   const [conceptType, setConceptType] = useState("");
   const [zeitgeist, setZeitgeist] = useState("");
+  const [audience, setAudience] = useState("");
+  const [moreFor, setMoreFor] = useState<number | null>(null);
+  const [moreError, setMoreError] = useState<{ index: number; error: AIRequestError } | null>(null);
+
+  // Three variations on a metaphor the participant liked, added under it.
+  const handleMore = async (index: number) => {
+    setMoreFor(index);
+    setMoreError(null);
+    try {
+      const extra = await callAI<MetaphorResult[]>("moreMetaphors", { description: input, metaphor: results[index].metaphor });
+      setResults((prev) => [...prev.slice(0, index + 1), ...extra, ...prev.slice(index + 1)]);
+    } catch (err) {
+      setMoreError({ index, error: toAIError(err) });
+    } finally {
+      setMoreFor(null);
+    }
+  };
   const [showZeitgeist, setShowZeitgeist] = useState(false);
   const [showZeitgeistInfo, setShowZeitgeistInfo] = useState(false);
   const [results, setResults] = useState<MetaphorResult[]>([]);
@@ -74,6 +100,7 @@ export function MetaphorGenerator() {
       const result = await callAI<MetaphorResult[]>("generateMetaphors", {
         description: input,
         conceptType,
+        audience,
         zeitgeist: zeitgeist.trim() || undefined,
       });
       setResults(result);
@@ -109,7 +136,7 @@ export function MetaphorGenerator() {
         </div>
         <p className="text-sm text-gray-500 leading-relaxed">
           Great metaphors make complex ideas instantly clear. They work because
-          their <em>mechanism</em> mirrors your real concept — not just how it
+          their <em>mechanism</em> mirrors your real concept, not just how it
           looks, but how it works. The best ones can be pictured by a
           10-year-old.
         </p>
@@ -124,12 +151,12 @@ export function MetaphorGenerator() {
             </label>
             <p className="text-xs text-gray-400 mb-2">
               Focus on the concept, process, or mechanism that people struggle
-              with — not your entire project.
+              with, not your entire project.
             </p>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. Our immune therapy works by training the body's own cells to recognise a threat they've been ignoring. The hard part to explain is that we're not adding anything new — we're reprogramming what's already there..."
+              placeholder="e.g. Our immune therapy works by training the body's own cells to recognise a threat they've been ignoring. The hard part to explain is that we're not adding anything new: we're reprogramming what's already there..."
               className="min-h-[110px] text-sm border-gray-300 focus:border-ep1 focus:ring-ep1"
             />
           </div>
@@ -200,7 +227,7 @@ export function MetaphorGenerator() {
                   <div className="p-3 bg-ep1-light/50 rounded-lg border border-ep1/20 text-xs text-navy/70 leading-relaxed space-y-1.5">
                     <p>
                       <strong>Topical metaphors</strong> connect your idea to
-                      something your audience is already thinking about — a TV
+                      something your audience is already thinking about: a TV
                       show, a sporting result, a viral moment, a cultural event.
                     </p>
                     <p>
@@ -217,7 +244,7 @@ export function MetaphorGenerator() {
                     <p>
                       In Story Studio&apos;s Brute Creativity exercise, we show
                       that most people can explain their work through any random
-                      object — the same is true of any live water-cooler moment.
+                      object, and the same is true of any live water-cooler moment.
                       If it&apos;s in the zeitgeist, it can probably carry your
                       metaphor.
                     </p>
@@ -225,6 +252,25 @@ export function MetaphorGenerator() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Audience */}
+          <div>
+            <p className="text-xs font-medium text-gray-600 mb-1.5">Who will hear it?</p>
+            <div className="flex flex-wrap gap-1.5">
+              {AUDIENCES.map((a) => (
+                <button
+                  key={a.value}
+                  type="button"
+                  onClick={() => setAudience(a.value)}
+                  className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
+                    audience === a.value ? "bg-navy text-white border-navy" : "border-gray-200 text-gray-600 hover:border-navy/40"
+                  }`}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Generate button */}
@@ -250,7 +296,7 @@ export function MetaphorGenerator() {
       {results.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-navy">
-            5 metaphors — each chosen for a different reason
+            Your metaphors, each chosen for a different reason
           </h2>
 
           {results.map((r, i) => {
@@ -317,13 +363,35 @@ export function MetaphorGenerator() {
                       </p>
                     </div>
                   )}
+
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleMore(i)}
+                      disabled={moreFor !== null}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-navy/70 hover:text-navy border border-gray-200 hover:border-navy/40 rounded-md px-2.5 py-1.5 disabled:opacity-60"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" /> {moreFor === i ? "Finding more..." : "More like this"}
+                    </button>
+                    <SaveButton
+                      tool="metaphor"
+                      title={r.metaphor.slice(0, 80)}
+                      data={{ input: { description: input, audience }, result: r }}
+                      label="Save"
+                    />
+                  </div>
+                  {moreError?.index === i && (
+                    <div className="mt-2">
+                      <AIErrorNotice error={moreError.error} onRetry={() => handleMore(i)} />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
           })}
 
           <p className="text-xs text-gray-400 italic">
-            These are starting points — edit and make them your own. The best
+            These are starting points: edit them and make them your own. The best
             metaphor is the one that feels natural when you say it out loud.
           </p>
         </div>

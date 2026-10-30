@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mic, ArrowLeft, Sparkles, Shield, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { callAI, listSaved, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { SaveButton } from "@/components/portal/SaveButton";
+import { PracticeSession } from "@/components/portal/PracticeSession";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface PrepResult {
@@ -22,12 +24,35 @@ export function InterviewPrep() {
   const [result, setResult] = useState<PrepResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AIRequestError | null>(null);
+  const [messages, setMessages] = useState(["", "", ""]);
+  const [importNote, setImportNote] = useState("");
+  const [practising, setPractising] = useState(false);
+  const keyMessages = messages.map((m) => m.trim()).filter(Boolean);
+
+  // Pull the three messages from the participant's latest Content Tool plan.
+  const importFromContentTool = async () => {
+    setImportNote("Looking for your plan...");
+    try {
+      const plans = await listSaved("content-tool");
+      const data = plans[0]?.data as { selectedMessages?: string[]; documents?: string } | undefined;
+      const found = (data?.selectedMessages || []).filter((m) => m && m.trim());
+      if (!found.length) {
+        setImportNote("No key messages found in your Content Tool plans yet.");
+        return;
+      }
+      setMessages([0, 1, 2].map((i) => found[i] || ""));
+      if (!topic.trim() && data?.documents) setTopic(data.documents.slice(0, 2000));
+      setImportNote(`Added ${found.length} message${found.length > 1 ? "s" : ""} from "${plans[0].title}".`);
+    } catch (err) {
+      setImportNote(toAIError(err).message);
+    }
+  };
 
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
     try {
-      setResult(await callAI<PrepResult>("prepInterview", { topic, format }));
+      setResult(await callAI<PrepResult>("prepInterview", { topic, format, keyMessages }));
     } catch (err) {
       setError(toAIError(err));
     } finally {
@@ -82,7 +107,37 @@ export function InterviewPrep() {
               className="text-sm border-gray-300 focus:border-ep3 focus:ring-ep3"
             />
           </div>
-          <div className="flex justify-end">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
+              <label className="text-xs font-medium text-gray-600">
+                Your key messages (optional, but the coaching is much better with them)
+              </label>
+              <button type="button" onClick={importFromContentTool} className="text-xs font-medium text-navy underline underline-offset-2">
+                Use my Content Tool messages
+              </button>
+            </div>
+            <div className="space-y-2">
+              {messages.map((m, i) => (
+                <Input
+                  key={i}
+                  value={m}
+                  onChange={(e) => setMessages(messages.map((x, j) => (j === i ? e.target.value : x)))}
+                  placeholder={["Message 1: the problem", "Message 2: what is different about your approach", "Message 3: how the world looks if it works"][i]}
+                  className="text-sm border-gray-300 focus:border-ep3 focus:ring-ep3"
+                />
+              ))}
+            </div>
+            {importNote && <p className="text-xs text-gray-500 mt-1">{importNote}</p>}
+          </div>
+          <div className="flex justify-end gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={() => setPractising(true)}
+              disabled={topic.trim().length < 15 || practising}
+              className="gap-2 border-navy/30 text-navy"
+            >
+              <Mic className="w-4 h-4" /> Practise live
+            </Button>
             <Button
               onClick={handleGenerate}
               disabled={topic.trim().length < 15 || loading}
@@ -96,6 +151,22 @@ export function InterviewPrep() {
       </Card>
 
       {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
+
+      {practising && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-navy">Live practice</h2>
+          <p className="text-xs text-gray-500">
+            Your coach plays the presenter. Answer out loud first if you can, then type what you said.
+          </p>
+          <PracticeSession
+            mode="interview"
+            topic={topic}
+            format={format}
+            keyMessages={keyMessages}
+            onExit={() => setPractising(false)}
+          />
+        </section>
+      )}
 
       {result && (
         <div className="space-y-6">
@@ -168,6 +239,12 @@ export function InterviewPrep() {
               </CardContent>
             </Card>
           </section>
+
+          <SaveButton
+            tool="interview-prep"
+            title={`Interview prep: ${topic.trim().slice(0, 60)}`}
+            data={{ input: { topic, format, keyMessages }, result }}
+          />
         </div>
       )}
     </div>

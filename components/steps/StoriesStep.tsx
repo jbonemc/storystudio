@@ -8,6 +8,7 @@ import { aiGenerateStoryAdvice } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, BookOpen, MessageSquare } from "lucide-react";
 import { toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { planFromState } from "@/lib/plan";
 
 interface Props {
   state: AppState;
@@ -31,7 +32,7 @@ export function StoriesStep({ state, updateState, onNext, onBack }: Props) {
     setAiError(null);
     setBusy(index);
     try {
-      const advice = await aiGenerateStoryAdvice(state.messages[index].story, index);
+      const advice = await aiGenerateStoryAdvice(state.messages[index].story, index, planFromState(state));
       const msgs = [...state.messages];
       msgs[index] = { ...msgs[index], storyAdvice: advice };
       updateState({ messages: msgs });

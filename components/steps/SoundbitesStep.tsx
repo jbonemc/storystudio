@@ -8,6 +8,7 @@ import { aiGenerateSoundbiteOptions, aiGenerateSoundbiteAdvice } from "@/lib/aiC
 import { ArrowLeft, ArrowRight, Sparkles, Quote, MessageSquare } from "lucide-react";
 import { toAIError, type AIRequestError } from "@/lib/aiClient";
 import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
+import { planFromState } from "@/lib/plan";
 
 interface Props {
   state: AppState;
@@ -27,7 +28,7 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
     setAiError(null);
     setBusy(index);
     try {
-      const opts = await aiGenerateSoundbiteOptions(state.selectedMessages[index], index);
+      const opts = await aiGenerateSoundbiteOptions(state.selectedMessages[index], index, planFromState(state));
       const newO = [...options]; newO[index] = opts; setOptions(newO);
       const newS = [...showOpts]; newS[index] = true; setShowOpts(newS);
     } catch (err) {
@@ -132,7 +133,7 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
       <div className="flex justify-between pt-2">
         <Button variant="ghost" onClick={onBack} className="gap-2 text-gray-500"><ArrowLeft className="w-4 h-4" /> Back</Button>
         <Button onClick={onNext} disabled={!allDone} className="bg-[#1F4E79] hover:bg-[#163a5c] text-white gap-2">
-          View Complete Plan <ArrowRight className="w-4 h-4" />
+          Next: Watchout <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

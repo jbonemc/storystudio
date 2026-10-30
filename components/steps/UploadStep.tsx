@@ -94,7 +94,7 @@ export function UploadStep({ state, updateState, onNext }: Props) {
           disabled={!canProceed}
           className="bg-[#1F4E79] hover:bg-[#163a5c] text-white gap-2"
         >
-          Next: Behaviour Change <ArrowRight className="w-4 h-4" />
+          Next: Why <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

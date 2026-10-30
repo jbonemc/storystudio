@@ -88,7 +88,7 @@ export async function generateDocxExport(state: AppState): Promise<void> {
           font: "Arial",
         }),
         new TextRun({
-          text: " — Content Tool",
+          text: ": Content Tool",
           size: 40,
           color: ACCENT_BLUE,
           font: "Arial",
@@ -114,10 +114,24 @@ export async function generateDocxExport(state: AppState): Promise<void> {
   children.push(rule(ACCENT_BLUE));
   children.push(gap(240));
 
-  // ── Behaviour Change ─────────────────────────────────────────────────────
-  children.push(label("Behaviour Change"));
+  // ── Why ──────────────────────────────────────────────────────────────────
+  children.push(label("Why: the change you want"));
   children.push(body(state.behaviourChange));
   children.push(gap(240));
+
+  // ── Who ──────────────────────────────────────────────────────────────────
+  const aud = state.audience;
+  const who = [
+    aud?.who && `In the room: ${aud.who}`,
+    aud?.think && `They think: ${aud.think}`,
+    aud?.care && `They care about: ${aud.care}`,
+    aud?.barriers && `Barriers: ${aud.barriers}`,
+  ].filter(Boolean) as string[];
+  if (who.length) {
+    children.push(label("Who"));
+    who.forEach((line) => children.push(body(line)));
+    children.push(gap(240));
+  }
 
   // ── Should Statement ─────────────────────────────────────────────────────
   children.push(label("Should Statement"));
@@ -153,7 +167,7 @@ export async function generateDocxExport(state: AppState): Promise<void> {
         spacing: { before: 0, after: 100 },
         children: [
           new TextRun({
-            text: `Message ${i + 1} — `,
+            text: `Message ${i + 1}: `,
             bold: true,
             size: 22,
             color: MID_GREY,
@@ -222,6 +236,15 @@ export async function generateDocxExport(state: AppState): Promise<void> {
     }
   });
 
+  // ── Watchout ─────────────────────────────────────────────────────────────
+  if (state.watchouts?.length) {
+    children.push(rule());
+    children.push(gap(200));
+    children.push(label("Watchout"));
+    state.watchouts.forEach((w) => children.push(body(`\u2022 ${w}`)));
+    children.push(gap(240));
+  }
+
   // ── Footer ───────────────────────────────────────────────────────────────
   children.push(rule(ACCENT_BLUE));
   children.push(gap(120));
@@ -231,7 +254,7 @@ export async function generateDocxExport(state: AppState): Promise<void> {
       spacing: { before: 0, after: 60 },
       children: [
         new TextRun({
-          text: "Behaviour Change + Should Statement + 3 Messages \u00d7 3 Proofs = Your 13-Item Master Plan",
+          text: "Why + Should Statement + 3 Messages, each with a story, a statistic and a soundbite",
           bold: true,
           size: 18,
           color: DARK_BLUE,

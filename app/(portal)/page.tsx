@@ -3,19 +3,19 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { episodes } from "@/lib/episodes/data";
-import { Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FileText, Download } from "lucide-react";
+import { Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FileText, Download, FlipHorizontal, Megaphone, Compass, MessagesSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const RESOURCES = [
   { name: "Story Studio Handbook", file: "story-studio-handbook.pdf", description: "The complete Story Studio reference guide" },
-  { name: "Episode 1 — Language", file: "episode-1-language.pdf", description: "Building blocks: visual, emotional, and logical language" },
-  { name: "Episode 2 — Story", file: "episode-2--story.pdf", description: "Story structures: PIP, setup-conflict-resolution, past-event-present" },
-  { name: "Episode 3 — Audience", file: "episode-3--audience-.pdf", description: "Sharing your story: delivery, interviews, and adaptation" },
+  { name: "Episode 1: Language", file: "episode-1-language.pdf", description: "Building blocks: visual, emotional, and logical language" },
+  { name: "Episode 2: Story", file: "episode-2--story.pdf", description: "Story structures: PIP, setup-conflict-resolution, past-event-present" },
+  { name: "Episode 3: Audience", file: "episode-3--audience-.pdf", description: "Sharing your story: delivery, interviews, and adaptation" },
   { name: "Content Tool", file: "content-tool.pdf", description: "The 13-item communication planning template" },
 ];
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic,
+  Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FlipHorizontal, Megaphone, Compass, MessagesSquare,
 };
 
 const CARD_GRADIENTS: Record<number, string> = {
@@ -80,7 +80,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Episode cards — horizontal scroll on mobile, grid on desktop */}
+      {/* Episode cards: horizontal scroll on mobile, grid on desktop */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-12 relative z-10">
         <div className="flex sm:grid sm:grid-cols-3 gap-5 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
           {episodes.map((ep, idx) => (
@@ -145,7 +145,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* How it works — animated steps */}
+      {/* How it works: animated steps */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <motion.div
           className="text-center mb-10"
@@ -163,7 +163,7 @@ export default function DashboardPage() {
             {
               step: "1",
               title: "Review",
-              desc: "Revisit core ideas from each episode — visual, emotional, and logical language; story structure; audience adaptation.",
+              desc: "Revisit core ideas from each episode: visual, emotional, and logical language; story structure; audience adaptation.",
               colour: "bg-ep1",
             },
             {
@@ -205,7 +205,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Resources — downloadable PDFs */}
+      {/* Resources: downloadable PDFs */}
       <ResourcesSection />
     </div>
   );
@@ -220,7 +220,7 @@ function ResourcesSection() {
       .createSignedUrl(file, 60);
 
     if (error || !data?.signedUrl) {
-      alert("Unable to download — please try again.");
+      alert("Unable to download. Please try again.");
       return;
     }
 

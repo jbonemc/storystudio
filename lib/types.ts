@@ -8,6 +8,13 @@ export interface MessageData {
   soundbiteAdvice: string;
 }
 
+export interface AudienceState {
+  who: string;
+  think: string;
+  care: string;
+  barriers: string;
+}
+
 export interface AppState {
   step: number;
   documents: string;
@@ -20,18 +27,24 @@ export interface AppState {
   selectedMessages: string[];
   messageExplanations: string[];
   messages: MessageData[];
+  /** WHO: the audience this plan is for. */
+  audience: AudienceState;
+  /** WATCHOUT: what could trip them up, and how they will handle it. */
+  watchouts: string[];
   isLoading: boolean;
 }
 
-export const TOTAL_STEPS = 8;
+export const TOTAL_STEPS = 10;
 
 export const STEP_LABELS = [
   "Upload",
-  "Behaviour Change",
+  "Why",
+  "Who",
   "Should Statement",
   "Key Messages",
   "Stories",
   "Statistics",
   "Soundbites",
+  "Watchout",
   "Summary"
 ];

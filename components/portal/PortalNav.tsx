@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { episodes } from "@/lib/episodes/data";
+import { Bookmark } from "lucide-react";
 
 const EPISODE_COLOURS: Record<number, string> = {
   1: "bg-ep1",
@@ -49,6 +50,17 @@ export function PortalNav() {
                 </Link>
               );
             })}
+            <Link
+              href="/story-bank"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                pathname.startsWith("/story-bank")
+                  ? "bg-white/15 text-white"
+                  : "text-white/60 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <Bookmark className="w-3 h-3" />
+              <span className="hidden sm:inline">Story Bank</span>
+            </Link>
           </nav>
         </div>
       </div>
