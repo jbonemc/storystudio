@@ -31,7 +31,9 @@ export default function LoginPage() {
       });
       const data = await res.json();
 
-      if (data.allowed) {
+      if (data.error) {
+        setError("We couldn't check your email just now. Please try again.");
+      } else if (data.allowed) {
         if (data.needsTerms) {
           setStep("terms");
         } else {
@@ -70,13 +72,12 @@ export default function LoginPage() {
     }
   }
 
+  // The agreement is recorded after the emailed code is accepted (see
+  // verifyCode), so it is tied to a verified email address.
+  const acceptedTerms = useRef(false);
+
   async function handleAcceptTerms() {
-    setLoading(true);
-    await fetch("/api/auth/accept-terms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email.toLowerCase().trim() }),
-    });
+    acceptedTerms.current = true;
     await sendOtp();
   }
 
@@ -136,6 +137,11 @@ export default function LoginPage() {
         inputRefs.current[0]?.focus();
         setLoading(false);
         return;
+      }
+
+      if (acceptedTerms.current) {
+        // If this fails they are simply shown the agreement again next time.
+        await fetch("/api/auth/accept-terms", { method: "POST" }).catch(() => {});
       }
 
       router.push("/");

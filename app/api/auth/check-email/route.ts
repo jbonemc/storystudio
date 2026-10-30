@@ -7,6 +7,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// Asks the database one narrow question (may this email sign in?) through the
+// check_participant_login function, instead of reading the participants table.
 export async function POST(request: NextRequest) {
   const { email } = await request.json();
 
@@ -15,31 +17,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ allowed: false }, { status: 400 });
   }
 
-  const normalised = email.toLowerCase().trim();
+  const normalised = String(email).toLowerCase().trim();
 
-  const { data, error } = await supabase
-    .from("participants")
-    .select("email, status, expires_at, accepted_terms_at")
-    .eq("email", normalised)
-    .single();
+  const { data: status, error } = await supabase.rpc("check_participant_login", {
+    p_email: normalised,
+  });
 
-  if (error || !data) {
-    await logAuthEvent("check-email:not-found", request, {}, normalised);
-    return NextResponse.json({ allowed: false });
+  if (error) {
+    await logAuthEvent("check-email:error", request, { error: error.message }, normalised);
+    return NextResponse.json({ allowed: false, error: "check-failed" }, { status: 500 });
   }
 
-  if (data.status === "revoked") {
-    await logAuthEvent("check-email:revoked", request, {}, normalised);
-    return NextResponse.json({ allowed: false });
+  if (status === "allowed" || status === "needs_terms") {
+    const needsTerms = status === "needs_terms";
+    await logAuthEvent("check-email:allowed", request, { needsTerms }, normalised);
+    return NextResponse.json({ allowed: true, needsTerms });
   }
 
-  if (new Date(data.expires_at) < new Date()) {
-    await logAuthEvent("check-email:expired", request, { expires_at: data.expires_at }, normalised);
-    return NextResponse.json({ allowed: false });
-  }
-
-  const needsTerms = !data.accepted_terms_at;
-  await logAuthEvent("check-email:allowed", request, { needsTerms }, normalised);
-
-  return NextResponse.json({ allowed: true, needsTerms });
+  // 'not_found', 'revoked' or 'expired'
+  const reason = status === "revoked" || status === "expired" ? status : "not-found";
+  await logAuthEvent(`check-email:${reason}`, request, {}, normalised);
+  return NextResponse.json({ allowed: false });
 }
