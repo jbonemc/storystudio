@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface AnalysisResult {
   visual: { score: number; examples: string[]; suggestions: string[] };
@@ -24,17 +26,15 @@ export function LanguageAnalyser() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AIRequestError | null>(null);
 
   const handleAnalyse = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "analyseLanguage", text: input }),
-      });
-      const data = await res.json();
-      setResult(data.result);
+      setResult(await callAI<AnalysisResult>("analyseLanguage", { text: input }));
+    } catch (err) {
+      setError(toAIError(err));
     } finally {
       setLoading(false);
     }
@@ -83,6 +83,8 @@ export function LanguageAnalyser() {
           </div>
         </CardContent>
       </Card>
+
+      {error && <AIErrorNotice error={error} onRetry={handleAnalyse} />}
 
       {result && (
         <div className="space-y-4">

@@ -1,15 +1,69 @@
 // Client-side helper that calls the /api/ai route.
-// Falls back gracefully — the API route itself falls back to mock AI if no key is set.
+// Every tool goes through callAI so a failure always reaches the screen as an
+// AIRequestError with a message the participant can act on.
 
-async function callAI<T>(type: string, params: Record<string, unknown>): Promise<T> {
-  const res = await fetch("/api/ai", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type, ...params }),
-  });
-  if (!res.ok) throw new Error(`AI request failed: ${res.status}`);
-  const data = await res.json();
-  return data.result as T;
+export class AIRequestError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "AIRequestError";
+    this.status = status;
+  }
+  /** True when the participant needs to sign in again before retrying. */
+  get needsSignIn() {
+    return this.status === 401;
+  }
+}
+
+const FALLBACK_MESSAGES: Record<number, string> = {
+  401: "Your session has ended. Please sign in again to keep using the tools.",
+  429: "Lots of requests at once. Please wait a minute and try again.",
+};
+
+export function toAIError(err: unknown): AIRequestError {
+  if (err instanceof AIRequestError) return err;
+  return new AIRequestError(
+    "We could not reach the AI service. Check your connection and try again.",
+    0
+  );
+}
+
+export async function callAI<T>(type: string, params: Record<string, unknown>): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, ...params }),
+    });
+  } catch {
+    throw toAIError(null);
+  }
+
+  let data: { result?: unknown; error?: string } = {};
+  try {
+    data = await res.json();
+  } catch {
+    // Non-JSON reply (for example a platform timeout page). Handled below.
+  }
+
+  if (!res.ok) {
+    throw new AIRequestError(
+      FALLBACK_MESSAGES[res.status] ||
+        data.error ||
+        "Something went wrong on our side. Please try again.",
+      res.status
+    );
+  }
+
+  const result = data.result;
+  if (result == null || (Array.isArray(result) && result.length === 0)) {
+    throw new AIRequestError(
+      "The AI sent back an empty answer. Please try again.",
+      res.status
+    );
+  }
+  return result as T;
 }
 
 export async function aiSummariseDocument(documents: string): Promise<string> {

@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface StoryResult {
   pip: { problem: string; inspiration: string; payoff: string; coaching: string };
@@ -18,17 +20,15 @@ export function StoryCoach() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<StoryResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AIRequestError | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "structureStory", story: input }),
-      });
-      const data = await res.json();
-      setResult(data.result);
+      setResult(await callAI<StoryResult>("structureStory", { story: input }));
+    } catch (err) {
+      setError(toAIError(err));
     } finally {
       setLoading(false);
     }
@@ -106,6 +106,8 @@ export function StoryCoach() {
           </div>
         </CardContent>
       </Card>
+
+      {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
 
       {result && (
         <Tabs defaultValue="pip">

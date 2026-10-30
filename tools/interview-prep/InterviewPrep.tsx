@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mic, ArrowLeft, Sparkles, Shield, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface PrepResult {
   likelyQuestions: { question: string; suggestedAnswer: string }[];
@@ -19,17 +21,15 @@ export function InterviewPrep() {
   const [format, setFormat] = useState("");
   const [result, setResult] = useState<PrepResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AIRequestError | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "prepInterview", topic, format }),
-      });
-      const data = await res.json();
-      setResult(data.result);
+      setResult(await callAI<PrepResult>("prepInterview", { topic, format }));
+    } catch (err) {
+      setError(toAIError(err));
     } finally {
       setLoading(false);
     }
@@ -94,6 +94,8 @@ export function InterviewPrep() {
           </div>
         </CardContent>
       </Card>
+
+      {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
 
       {result && (
         <div className="space-y-6">

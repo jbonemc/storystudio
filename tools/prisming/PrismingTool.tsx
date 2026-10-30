@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { RefreshCw, ArrowLeft, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
+import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface PrismResult {
   stakeholder: string;
@@ -18,18 +20,17 @@ export function PrismingTool() {
   const [prisms, setPrisms] = useState<PrismResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  const [error, setError] = useState<AIRequestError | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "generatePrisms", description: input }),
-      });
-      const data = await res.json();
-      setPrisms(data.result || []);
+      const result = await callAI<PrismResult[]>("generatePrisms", { description: input });
+      setPrisms(result);
       setSelected(null);
+    } catch (err) {
+      setError(toAIError(err));
     } finally {
       setLoading(false);
     }
@@ -81,6 +82,8 @@ export function PrismingTool() {
         </CardContent>
       </Card>
 
+      {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
+
       {prisms.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-1">
@@ -89,6 +92,10 @@ export function PrismingTool() {
               {prisms.length} perspectives on your work
             </h2>
           </div>
+          <p className="text-xs text-gray-500">
+            These are imagined voices to help you find new angles. Check anything
+            you plan to say in public against what the people involved have told you.
+          </p>
           {prisms.map((p, i) => (
             <button
               key={i}

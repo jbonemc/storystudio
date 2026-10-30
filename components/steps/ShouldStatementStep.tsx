@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AppState } from "@/lib/types";
 import { aiGenerateShouldStatements } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, Sparkles, Pencil } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -18,16 +20,21 @@ interface Props {
 export function ShouldStatementStep({ state, updateState, onNext, onBack }: Props) {
   const [isCustom, setIsCustom] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AIRequestError | null>(null);
+
+  const loadStatements = () => {
+    setLoading(true);
+    setError(null);
+    aiGenerateShouldStatements(state.documents, state.behaviourChange)
+      .then((statements) => {
+        updateState({ shouldStatements: statements });
+      })
+      .catch((err) => setError(toAIError(err)))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    if (state.shouldStatements.length === 0) {
-      setLoading(true);
-      aiGenerateShouldStatements(state.documents, state.behaviourChange)
-        .then((statements) => {
-          updateState({ shouldStatements: statements });
-        })
-        .finally(() => setLoading(false));
-    }
+    if (state.shouldStatements.length === 0) loadStatements();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -52,6 +59,8 @@ export function ShouldStatementStep({ state, updateState, onNext, onBack }: Prop
         </Card>
       ) : (
         <>
+          {error && <AIErrorNotice error={error} onRetry={loadStatements} />}
+
           <div className="space-y-2">
             {state.shouldStatements.map((stmt, i) => (
               <button

@@ -6,6 +6,8 @@ import { AppState } from "@/lib/types";
 import { aiGeneratePIPSuggestions } from "@/lib/aiClient";
 import type { PIPSuggestions } from "@/lib/mockAI";
 import { ArrowLeft, ArrowRight, Sparkles, Check, Pencil } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -56,10 +58,22 @@ export function KeyMessagesStep({ state, updateState, onNext, onBack }: Props) {
     return pipSuggestions[keys[slotIndex]] || [];
   };
 
+  const [inspiring, setInspiring] = useState<number | null>(null);
+  const [aiError, setAiError] = useState<{ slot: number; error: AIRequestError } | null>(null);
+
   const handleInspire = async (slotIndex: number) => {
+    setAiError(null);
     if (!pipSuggestions) {
-      const suggestions = await aiGeneratePIPSuggestions(state.documents, shouldStatement);
-      setPipSuggestions(suggestions);
+      setInspiring(slotIndex);
+      try {
+        const suggestions = await aiGeneratePIPSuggestions(state.documents, shouldStatement);
+        setPipSuggestions(suggestions);
+      } catch (err) {
+        setAiError({ slot: slotIndex, error: toAIError(err) });
+        return;
+      } finally {
+        setInspiring(null);
+      }
     }
     const updated = [...showSuggestions];
     updated[slotIndex] = !updated[slotIndex];
@@ -175,14 +189,19 @@ export function KeyMessagesStep({ state, updateState, onNext, onBack }: Props) {
                       </Button>
                       <Button
                         onClick={() => handleInspire(slotIndex)}
+                        disabled={inspiring !== null}
                         size="sm"
                         variant="outline"
                         className="border-[#2E75B6] text-[#2E75B6] hover:bg-[#EAF2FA]"
                       >
                         <Sparkles className="w-3.5 h-3.5 mr-1" />
-                        {showSuggestions[slotIndex] ? "Hide ideas" : "Inspire me"}
+                        {inspiring === slotIndex ? "Thinking..." : showSuggestions[slotIndex] ? "Hide ideas" : "Inspire me"}
                       </Button>
                     </div>
+
+                    {aiError?.slot === slotIndex && (
+                      <AIErrorNotice error={aiError.error} onRetry={() => handleInspire(slotIndex)} />
+                    )}
 
                     {/* Suggestions panel */}
                     {showSuggestions[slotIndex] && suggestions.length > 0 && (

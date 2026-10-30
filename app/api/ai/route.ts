@@ -36,7 +36,9 @@ const THINKING_OFF =
     : undefined;
 
 // ── System prompt for Story Studio ──────────────────────────────────────────
-const SYSTEM_PROMPT = `You are the Story Studio Content Tool — a warm, expert communications coach built on the Story Studio framework by Jonathan McCrea (storystudiocourse.com).
+// The house rules section is Jonathan's own style guide. Keep it in step with
+// the Language section of his global CLAUDE.md.
+const SYSTEM_PROMPT = `You are the Story Studio coach: a warm, expert communications coach built on the Story Studio framework by Jonathan McCrea (storystudio.ie).
 
 Your job is to help researchers and professionals build a complete communication plan using the PIP framework:
 - Problem: What injustice or unresolved gap does this work address?
@@ -45,11 +47,22 @@ Your job is to help researchers and professionals build a complete communication
 
 You also work with:
 - Should Statements: Short injustice claims (e.g. "No child should go to school hungry when solutions exist"). NOT about specific technology. Broad moral claims about what's wrong with the world.
-- Stories: Personal, specific, sensory moments that make messages human
-- Statistics: One powerful, well-framed number that anchors a claim
-- Soundbites: Under 15 words, memorable, quotable — what someone repeats to a colleague
+- Stories: Personal, specific, sensory moments that make messages human.
+- Statistics: One powerful, well-framed number that anchors a claim.
+- Soundbites: Under 15 words, memorable, quotable: what someone repeats to a colleague.
 
 Your tone is warm, encouraging, direct and specific. You coach, you don't lecture. You always connect suggestions back to the user's actual work.
+
+FACTS (this matters more than anything else here):
+- Use only the facts, figures, names, results and anecdotes the user has given you.
+- Never invent statistics, study results, quotes, patient or family details, events or outcomes. The user may repeat your words in public, on air or to a funder, so a made-up detail can embarrass them.
+- When a suggestion needs a fact they have not given you, write a placeholder in square brackets that says what to put there, e.g. [your local figure] or [a patient you have met], so they know to fill it in.
+- General knowledge that any informed listener would accept (e.g. that open-heart surgery means opening the chest) is fine. Specific claims about their work or their people are not.
+
+HOUSE STYLE (applies to every word you write):
+- UK English spelling and vocabulary (organise, programme, behaviour, colour).
+- Never use em dashes or en dashes. Use commas, colons, brackets or separate sentences instead. Hyphens in compound words are fine.
+- Never use these words or phrases in any form: "land", "lands", "landing", "landed" (as in a message or point landing), "honest", "honestly", "to be honest", "the honest answer is", "where I'd push", "that's on me". Say the thing directly instead. Do not swap in a synonym that does the same job.
 
 Always respond with valid JSON matching the format requested.`;
 
@@ -59,11 +72,14 @@ Always respond with valid JSON matching the format requested.`;
 const COST_PER_INPUT_MTOK = 2;
 const COST_PER_OUTPUT_MTOK = 10;
 
-// These are set per-request in the POST handler
-let _reqToolType: string | undefined;
-let _reqUserEmail: string | undefined;
+// Who made the request, for the usage log. Passed per call rather than held in
+// module variables, which concurrent requests on the same server would overwrite.
+interface RequestContext {
+  toolType: string;
+  userEmail: string;
+}
 
-async function callClaude(prompt: string): Promise<string> {
+async function callClaude(prompt: string, ctx: RequestContext): Promise<string> {
   if (!client) throw new Error("No API key");
   const msg = await client.messages.create({
     model: CLAUDE_MODEL,
@@ -79,7 +95,7 @@ async function callClaude(prompt: string): Promise<string> {
   if (content.type !== "text") throw new Error("Unexpected response type");
 
   // Log usage (fire-and-forget, don't block response)
-  if (_reqUserEmail && _reqToolType) {
+  {
     const inputTokens = msg.usage?.input_tokens || 0;
     const outputTokens = msg.usage?.output_tokens || 0;
     const estimatedCost =
@@ -93,8 +109,8 @@ async function callClaude(prompt: string): Promise<string> {
     supabase
       .from("usage_log")
       .insert({
-        user_email: _reqUserEmail,
-        tool_type: _reqToolType,
+        user_email: ctx.userEmail,
+        tool_type: ctx.toolType,
         endpoint: "ai",
         input_tokens: inputTokens,
         output_tokens: outputTokens,
@@ -170,24 +186,35 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { type, ...params } = body;
 
-  // Set request context for logging
-  _reqToolType = type;
+  // Only signed-in participants may use the AI. The middleware lets every
+  // /api/ path through, so this route has to check for itself.
+  let userEmail: string | undefined;
   try {
-    // Try portal-session cookie first (direct login)
+    // Signed portal-session cookie first, then the Supabase login (emailed code).
     const cookieStore = await cookies();
     const portalToken = cookieStore.get("portal-session")?.value;
     if (portalToken) {
       const { payload } = await jwtVerify(portalToken, PORTAL_SECRET);
-      _reqUserEmail = (payload.email as string) || undefined;
-    } else {
-      // Fall back to Supabase auth (magic link login)
+      userEmail = (payload.email as string) || undefined;
+    }
+    if (!userEmail) {
       const supabase = await createServerClient();
       const { data: { user } } = await supabase.auth.getUser();
-      _reqUserEmail = user?.email || undefined;
+      userEmail = user?.email || undefined;
     }
   } catch {
-    _reqUserEmail = undefined;
+    userEmail = undefined;
   }
+
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "Your session has ended. Please sign in again to keep using the tools." },
+      { status: 401 }
+    );
+  }
+
+  const ctx: RequestContext = { toolType: String(type), userEmail };
+  const ask = (prompt: string) => callClaude(prompt, ctx);
 
   try {
     // If no API key, fall back to mock AI for all types
@@ -202,7 +229,7 @@ export async function POST(req: NextRequest) {
 
 Document:
 ${documents.slice(0, 3000)}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { summary } = await parseJSON<{ summary: string }>(raw);
         return NextResponse.json({ result: summary });
       }
@@ -227,7 +254,7 @@ Respond with JSON: {"suggestions": ["suggestion 1", "suggestion 2", "suggestion 
 
 Document:
 ${documents.slice(0, 2500)}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { suggestions } = await parseJSON<{ suggestions: string[] }>(raw);
         return NextResponse.json({ result: suggestions });
       }
@@ -250,7 +277,7 @@ Respond with JSON: {"statements": ["statement 1", "statement 2", "statement 3", 
 
 Research context: ${behaviourChange}
 Documents: ${documents.slice(0, 1500)}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { statements } = await parseJSON<{ statements: string[] }>(raw);
         return NextResponse.json({ result: statements });
       }
@@ -268,7 +295,7 @@ Should Statement: "${shouldStatement}"
 Research: ${documents.slice(0, 2000)}
 
 Respond with JSON: {"problem": ["p1", "p2", "p3"], "inspiration": ["i1", "i2", "i3"], "payoff": ["pay1", "pay2", "pay3"]}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const result = await parseJSON<{ problem: string[]; inspiration: string[]; payoff: string[] }>(raw);
         return NextResponse.json({ result });
       }
@@ -280,7 +307,7 @@ Respond with JSON: {"problem": ["p1", "p2", "p3"], "inspiration": ["i1", "i2", "
 Story: ${story}
 
 Respond with JSON: {"advice": "coaching text here (3-4 short paragraphs, uses line breaks between them)"}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { advice } = await parseJSON<{ advice: string }>(raw);
         return NextResponse.json({ result: advice });
       }
@@ -292,7 +319,7 @@ Respond with JSON: {"advice": "coaching text here (3-4 short paragraphs, uses li
 Statistic: ${statistic}
 
 Respond with JSON: {"advice": "coaching text here (2-3 short paragraphs)"}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { advice } = await parseJSON<{ advice: string }>(raw);
         return NextResponse.json({ result: advice });
       }
@@ -308,7 +335,7 @@ Respond with JSON: {"advice": "coaching text here (2-3 short paragraphs)"}`;
 Key message: ${message}
 
 Respond with JSON: {"options": ["soundbite 1", "soundbite 2", "soundbite 3"]}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { options } = await parseJSON<{ options: string[] }>(raw);
         return NextResponse.json({ result: options });
       }
@@ -320,7 +347,7 @@ Respond with JSON: {"options": ["soundbite 1", "soundbite 2", "soundbite 3"]}`;
 Soundbite: "${soundbite}"
 
 Respond with JSON: {"advice": "brief analysis and coaching (2 short paragraphs)"}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { advice } = await parseJSON<{ advice: string }>(raw);
         return NextResponse.json({ result: advice });
       }
@@ -381,7 +408,7 @@ For each metaphor, provide:
 
 Respond with JSON: {"metaphors": [{...}, {...}, {...}, {...}, {...}]}`;
 
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const parsed = await parseJSON<{ metaphors: object[] }>(raw);
         return NextResponse.json({ result: parsed.metaphors });
       }
@@ -395,7 +422,7 @@ Respond with JSON: {"metaphors": [{...}, {...}, {...}, {...}, {...}]}`;
 
 For each type, give:
 1. A score from 0-100 representing how much of that type is present
-2. Up to 3 specific phrases from the text that exemplify that type
+2. Up to 3 specific phrases quoted exactly from the text that genuinely are that type. Technical terms and jargon are not visual or emotional language. If a type is barely present, return an empty examples array rather than quoting phrases of a different type.
 3. Up to 2 concrete suggestions for adding more of that type
 
 Also provide an overall 2-sentence assessment of the language balance.
@@ -408,7 +435,7 @@ Respond with JSON: {
   "logical": {"score": N, "examples": [...], "suggestions": [...]},
   "overall": "assessment text"
 }`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const result = await parseJSON<object>(raw);
         return NextResponse.json({ result });
       }
@@ -430,7 +457,7 @@ Respond with JSON: {
   "scr": {"setup": "...", "conflict": "...", "resolution": "...", "coaching": "..."},
   "pep": {"past": "...", "event": "...", "present": "...", "coaching": "..."}
 }`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const result = await parseJSON<object>(raw);
         return NextResponse.json({ result });
       }
@@ -444,10 +471,12 @@ Given this description of someone's work, identify 5-6 different stakeholders wh
 2. A one-line angle description (what makes their perspective interesting)
 3. A 2-3 sentence retelling of the work from THEIR perspective, in first person or close third person
 
+These are imagined voices to help the user find new angles. Ground each one in what the description says. Do not give the stakeholder invented backstory, events, anecdotes or figures (e.g. "after a friend's husband died"); describe how they would feel about the facts that are given.
+
 Description: ${description.slice(0, 2000)}
 
 Respond with JSON: {"prisms": [{"stakeholder": "...", "angle": "...", "perspective": "..."}, ...]}`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const { prisms } = await parseJSON<{ prisms: object[] }>(raw);
         return NextResponse.json({ result: prisms });
       }
@@ -468,7 +497,7 @@ Respond with JSON: {
   "blockingBridging": [{"scenario": "...", "block": "...", "bridge": "..."}, ...],
   "deliveryTips": ["tip 1", "tip 2", "tip 3", "tip 4"]
 }`;
-        const raw = await callClaude(prompt);
+        const raw = await ask(prompt);
         const result = await parseJSON<object>(raw);
         return NextResponse.json({ result });
       }

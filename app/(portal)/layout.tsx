@@ -10,7 +10,7 @@ export default function PortalLayout({
       <PortalNav />
       {children}
       <footer className="text-center text-xs text-gray-300 py-8 border-t border-gray-100">
-        Story Studio by Whipsmart Media &middot; storystudiocourse.com
+        Story Studio by Whipsmart Media &middot; storystudio.ie
       </footer>
     </div>
   );

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AppState } from "@/lib/types";
 import { aiSummariseDocument } from "@/lib/aiClient";
 import { FileText, ArrowRight, AlertCircle } from "lucide-react";
+import { toAIError } from "@/lib/aiClient";
 
 interface Props {
   state: AppState;
@@ -23,8 +24,8 @@ export function UploadStep({ state, updateState, onNext }: Props) {
     try {
       const summary = await aiSummariseDocument(state.documents);
       updateState({ documentSummary: summary, isLoading: false });
-    } catch {
-      setError("Something went wrong analysing your content. Please try again.");
+    } catch (err) {
+      setError(toAIError(err).message);
       updateState({ isLoading: false });
     }
   };

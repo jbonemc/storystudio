@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppState } from "@/lib/types";
 import { aiGenerateSoundbiteOptions, aiGenerateSoundbiteAdvice } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, Sparkles, Quote, MessageSquare } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -16,15 +18,23 @@ interface Props {
 
 export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
   const [activeTab, setActiveTab] = useState("0");
+  const [busy, setBusy] = useState<number | null>(null);
+  const [aiError, setAiError] = useState<{ index: number; error: AIRequestError; retry: () => void } | null>(null);
   const [options, setOptions] = useState<string[][]>([[], [], []]);
   const [showOpts, setShowOpts] = useState([false, false, false]);
 
   const handleGenerate = async (index: number) => {
+    setAiError(null);
+    setBusy(index);
     try {
       const opts = await aiGenerateSoundbiteOptions(state.selectedMessages[index], index);
       const newO = [...options]; newO[index] = opts; setOptions(newO);
       const newS = [...showOpts]; newS[index] = true; setShowOpts(newS);
-    } catch { /* silent fail */ }
+    } catch (err) {
+      setAiError({ index, error: toAIError(err), retry: () => handleGenerate(index) });
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleSelect = (mi: number, sb: string) => {
@@ -40,12 +50,18 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
   };
 
   const handleAdvice = async (index: number) => {
+    setAiError(null);
+    setBusy(index);
     try {
       const advice = await aiGenerateSoundbiteAdvice(state.messages[index].soundbite);
       const msgs = [...state.messages];
       msgs[index] = { ...msgs[index], soundbiteAdvice: advice };
       updateState({ messages: msgs });
-    } catch { /* silent fail */ }
+    } catch (err) {
+      setAiError({ index, error: toAIError(err), retry: () => handleAdvice(index) });
+    } finally {
+      setBusy(null);
+    }
   };
 
   const allDone = state.messages.slice(0, 3).every((m) => m.soundbite.trim().length >= 5);
@@ -75,8 +91,8 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
               <strong>Message {i + 1}:</strong> {state.selectedMessages[i]}
             </div>
             {!showOpts[i] && (
-              <Button onClick={() => handleGenerate(i)} className="bg-[#2E75B6] hover:bg-[#1F4E79] text-white gap-2" size="sm">
-                <Sparkles className="w-3.5 h-3.5" /> Generate soundbite ideas
+              <Button onClick={() => handleGenerate(i)} disabled={busy === i} className="bg-[#2E75B6] hover:bg-[#1F4E79] text-white gap-2" size="sm">
+                <Sparkles className="w-3.5 h-3.5" /> {busy === i ? "Thinking..." : "Generate soundbite ideas"}
               </Button>
             )}
             {showOpts[i] && (
@@ -96,9 +112,9 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
             <Input value={state.messages[i].soundbite} onChange={(e) => handleCustom(i, e.target.value)}
               placeholder="Or write your own soundbite..." className="text-sm border-gray-300" />
             {state.messages[i].soundbite.trim().length >= 5 && (
-              <Button onClick={() => handleAdvice(i)} variant="outline"
+              <Button onClick={() => handleAdvice(i)} disabled={busy === i} variant="outline"
                 className="gap-2 border-[#2E75B6] text-[#2E75B6] hover:bg-[#EAF2FA]" size="sm">
-                <MessageSquare className="w-3.5 h-3.5" /> Why does this soundbite work?
+                <MessageSquare className="w-3.5 h-3.5" /> {busy === i ? "Thinking..." : "Why does this soundbite work?"}
               </Button>
             )}
             {state.messages[i].soundbiteAdvice && (
@@ -108,6 +124,7 @@ export function SoundbitesStep({ state, updateState, onNext, onBack }: Props) {
                 </CardContent>
               </Card>
             )}
+            {aiError?.index === i && <AIErrorNotice error={aiError.error} onRetry={aiError.retry} />}
           </TabsContent>
         ))}
       </Tabs>

@@ -20,6 +20,8 @@ import {
   Target,
 } from "lucide-react";
 import Link from "next/link";
+import { callAI, toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 const CONCEPT_TYPES = [
   { value: "", label: "Let the AI figure it out" },
@@ -63,22 +65,21 @@ export function MetaphorGenerator() {
   const [copied, setCopied] = useState<number | null>(null);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
+  const [error, setError] = useState<AIRequestError | null>(null);
+
   const handleGenerate = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "generateMetaphors",
-          description: input,
-          conceptType,
-          zeitgeist: zeitgeist.trim() || undefined,
-        }),
+      const result = await callAI<MetaphorResult[]>("generateMetaphors", {
+        description: input,
+        conceptType,
+        zeitgeist: zeitgeist.trim() || undefined,
       });
-      const data = await res.json();
-      setResults(data.result || []);
+      setResults(result);
       setExpandedCard(null);
+    } catch (err) {
+      setError(toAIError(err));
     } finally {
       setLoading(false);
     }
@@ -242,6 +243,8 @@ export function MetaphorGenerator() {
           </div>
         </CardContent>
       </Card>
+
+      {error && <AIErrorNotice error={error} onRetry={handleGenerate} />}
 
       {/* Results */}
       {results.length > 0 && (

@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppState } from "@/lib/types";
 import { aiGenerateStatisticAdvice } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, BarChart3, MessageSquare } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -16,6 +18,8 @@ interface Props {
 
 export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
   const [activeTab, setActiveTab] = useState("0");
+  const [busy, setBusy] = useState<number | null>(null);
+  const [aiError, setAiError] = useState<{ index: number; error: AIRequestError; retry: () => void } | null>(null);
 
   const handleStatChange = (index: number, statistic: string) => {
     const msgs = [...state.messages];
@@ -24,12 +28,18 @@ export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
   };
 
   const handleGetAdvice = async (index: number) => {
+    setAiError(null);
+    setBusy(index);
     try {
       const advice = await aiGenerateStatisticAdvice(state.messages[index].statistic, index);
       const msgs = [...state.messages];
       msgs[index] = { ...msgs[index], statisticAdvice: advice };
       updateState({ messages: msgs });
-    } catch { /* silent fail */ }
+    } catch (err) {
+      setAiError({ index, error: toAIError(err), retry: () => handleGetAdvice(index) });
+    } finally {
+      setBusy(null);
+    }
   };
 
   const allHaveStats = state.messages.slice(0, 3).every((m) => m.statistic.trim().length >= 5);
@@ -66,9 +76,9 @@ export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
             <Textarea value={state.messages[i].statistic} onChange={(e) => handleStatChange(i, e.target.value)}
               placeholder="What numbers, percentages, costs, or comparisons support this message?"
               className="min-h-[80px] text-sm border-gray-300" />
-            <Button onClick={() => handleGetAdvice(i)} disabled={state.messages[i].statistic.trim().length < 5}
+            <Button onClick={() => handleGetAdvice(i)} disabled={state.messages[i].statistic.trim().length < 5 || busy === i}
               variant="outline" className="gap-2 border-[#2E75B6] text-[#2E75B6] hover:bg-[#EAF2FA]" size="sm">
-              <MessageSquare className="w-3.5 h-3.5" /> Help me frame this number
+              <MessageSquare className="w-3.5 h-3.5" /> {busy === i ? "Thinking..." : "Help me frame this number"}
             </Button>
             {state.messages[i].statisticAdvice && (
               <Card className="border-[#2E75B6]/20 bg-[#EAF2FA]/30">
@@ -77,6 +87,7 @@ export function StatisticsStep({ state, updateState, onNext, onBack }: Props) {
                 </CardContent>
               </Card>
             )}
+            {aiError?.index === i && <AIErrorNotice error={aiError.error} onRetry={aiError.retry} />}
           </TabsContent>
         ))}
       </Tabs>

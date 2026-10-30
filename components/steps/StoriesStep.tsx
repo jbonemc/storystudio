@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppState } from "@/lib/types";
 import { aiGenerateStoryAdvice } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, BookOpen, MessageSquare } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -16,6 +18,8 @@ interface Props {
 
 export function StoriesStep({ state, updateState, onNext, onBack }: Props) {
   const [activeTab, setActiveTab] = useState("0");
+  const [busy, setBusy] = useState<number | null>(null);
+  const [aiError, setAiError] = useState<{ index: number; error: AIRequestError; retry: () => void } | null>(null);
 
   const handleStoryChange = (index: number, story: string) => {
     const msgs = [...state.messages];
@@ -24,12 +28,18 @@ export function StoriesStep({ state, updateState, onNext, onBack }: Props) {
   };
 
   const handleGetAdvice = async (index: number) => {
+    setAiError(null);
+    setBusy(index);
     try {
       const advice = await aiGenerateStoryAdvice(state.messages[index].story, index);
       const msgs = [...state.messages];
       msgs[index] = { ...msgs[index], storyAdvice: advice };
       updateState({ messages: msgs });
-    } catch { /* silent fail */ }
+    } catch (err) {
+      setAiError({ index, error: toAIError(err), retry: () => handleGetAdvice(index) });
+    } finally {
+      setBusy(null);
+    }
   };
 
   const allHaveStories = state.messages.slice(0, 3).every((m) => m.story.trim().length >= 10);
@@ -68,9 +78,9 @@ export function StoriesStep({ state, updateState, onNext, onBack }: Props) {
             <Textarea value={state.messages[i].story} onChange={(e) => handleStoryChange(i, e.target.value)}
               placeholder="Tell me about a specific moment, person, or experience that illustrates this message..."
               className="min-h-[120px] text-sm border-gray-300" />
-            <Button onClick={() => handleGetAdvice(i)} disabled={state.messages[i].story.trim().length < 10}
+            <Button onClick={() => handleGetAdvice(i)} disabled={state.messages[i].story.trim().length < 10 || busy === i}
               variant="outline" className="gap-2 border-[#2E75B6] text-[#2E75B6] hover:bg-[#EAF2FA]" size="sm">
-              <MessageSquare className="w-3.5 h-3.5" /> Show me how to use this story
+              <MessageSquare className="w-3.5 h-3.5" /> {busy === i ? "Thinking..." : "Show me how to use this story"}
             </Button>
             {state.messages[i].storyAdvice && (
               <Card className="border-[#2E75B6]/20 bg-[#EAF2FA]/30">
@@ -79,6 +89,7 @@ export function StoriesStep({ state, updateState, onNext, onBack }: Props) {
                 </CardContent>
               </Card>
             )}
+            {aiError?.index === i && <AIErrorNotice error={aiError.error} onRetry={aiError.retry} />}
           </TabsContent>
         ))}
       </Tabs>

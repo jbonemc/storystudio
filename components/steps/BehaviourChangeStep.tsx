@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AppState } from "@/lib/types";
 import { aiSuggestBehaviourChanges } from "@/lib/aiClient";
 import { ArrowLeft, ArrowRight, Lightbulb, AlertCircle } from "lucide-react";
+import { toAIError, type AIRequestError } from "@/lib/aiClient";
+import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 
 interface Props {
   state: AppState;
@@ -33,6 +35,7 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [error, setError] = useState<AIRequestError | null>(null);
 
   const showAwarenessNudge = isRaisingAwareness(state.behaviourChange);
 
@@ -40,9 +43,13 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
     setShowSuggestions(true);
     if (suggestions.length === 0) {
       setLoadingSuggestions(true);
+      setError(null);
       try {
         const s = await aiSuggestBehaviourChanges(state.documents);
         setSuggestions(s);
+      } catch (err) {
+        setError(toAIError(err));
+        setShowSuggestions(false);
       } finally {
         setLoadingSuggestions(false);
       }
@@ -108,6 +115,8 @@ export function BehaviourChangeStep({ state, updateState, onNext, onBack }: Prop
           </CardContent>
         </Card>
       )}
+
+      {error && <AIErrorNotice error={error} onRetry={handleShowSuggestions} />}
 
       {!showSuggestions && (
         <Button
