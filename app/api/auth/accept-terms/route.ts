@@ -1,31 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 import { logAuthEvent } from "@/lib/authLog";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
+// Records the fair use agreement for the signed-in participant. The login page
+// calls this straight after the emailed code is accepted, so the record is
+// tied to a verified email rather than to whatever address someone typed.
 export async function POST(request: NextRequest) {
-  const { email } = await request.json();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!email) {
-    return NextResponse.json({ success: false }, { status: 400 });
+  if (!user?.email) {
+    await logAuthEvent("accept-terms:not-signed-in", request);
+    return NextResponse.json({ success: false }, { status: 401 });
   }
 
-  const normalised = email.toLowerCase().trim();
+  const email = user.email.toLowerCase().trim();
+  const { data: updated, error } = await supabase.rpc("accept_my_terms");
 
-  const { error } = await supabase
-    .from("participants")
-    .update({ accepted_terms_at: new Date().toISOString() })
-    .eq("email", normalised);
-
-  if (error) {
-    await logAuthEvent("accept-terms:error", request, { error: error.message }, normalised);
+  if (error || !updated) {
+    await logAuthEvent(
+      "accept-terms:error",
+      request,
+      { error: error?.message || "no matching participant" },
+      email
+    );
     return NextResponse.json({ success: false }, { status: 500 });
   }
 
-  await logAuthEvent("accept-terms:success", request, {}, normalised);
+  await logAuthEvent("accept-terms:success", request, {}, email);
   return NextResponse.json({ success: true });
 }
