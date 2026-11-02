@@ -190,3 +190,8 @@ A secondary issue: even without scanners, the PKCE `code_verifier` cookie was no
 - **Open:** every run so far picks "the opposite of the expert being right" as its sincere one; fine but a little formulaic. Not checked in the browser signed in (OTP login). Tag `backup-2026-11-02-before-opposites-rework`.
 - Deployed 2 Nov (storystudio-63z9yt4ap, commit f8d6b61), live at portal.storystudio.ie. Live check: opposites page redirects to login signed out, /api/ai 401 signed out, login 200. Not checked live: a signed-in Opposites run.
 - Story Bank status checked live: `saved_work` table still does not exist on Supabase fftvpzembbaxaoqwjtgy (tables: participants, usage_log, auth_logs). Turning it on = apply `supabase/migrations/20261030_create_saved_work.sql` (creates one table with RLS; nothing destructive).
+
+## 2026-11-02: Story Bank switched on
+- **Requested:** turn on Story Bank (Jonathan confirmed the Supabase org is on Pro, USD 25 a month, so no extra cost).
+- **Changed:** applied `supabase/migrations/20261030_create_saved_work.sql` to project fftvpzembbaxaoqwjtgy through the Supabase connector (migration name `create_saved_work`). No code change.
+- **Verified:** `saved_work` listed with RLS on, 0 rows; REST read with the anon key returns 200 `[]` (schema cache sees it); live `/api/saved` returns 401 signed out. Not verified: a signed-in save and read-back (needs an OTP login).
