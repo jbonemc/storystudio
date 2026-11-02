@@ -304,16 +304,35 @@ Respond with JSON: {"rewrite": "...", "changes": ["one line per main change and 
 
   generateOpposites: {
     tier: "standard",
-    build: (p) => `Story Studio's Opposites Device: think about how you usually talk about your work, then say the opposite. It breaks habitual phrasing and often produces a far more memorable opening.
+    build: (p) => `Story Studio's Opposites Device. A researcher's usual way of talking about their work has stopped working: the audience has heard the message before and switched off. The device takes the message they always deliver and says the exact opposite, pushed far enough to be provocative, usually funny, and impossible to ignore. The irony must be unmistakable. Underneath the joke there is always a real point, and the provocation is how the audience arrives at that point fresh.
 
 Here is how this person usually describes their work:
-${str(p.description, 2500)}
+"""${str(p.description, 2500)}"""
 
-1. Name their usual framing in one plain sentence (the habit they are stuck in).
-2. Write 4 opposite openings, each 1-2 sentences, each flipping a different expectation (for example: lead with failure instead of success, the small instead of the big, what we do not know instead of what we know, the audience's view instead of the researcher's). Each must stay true to their work; no invented facts.
-3. For each, one line on when to use it and the risk to watch for. Write these in your own words; do not repeat course phrases such as "a spice, not a meal", which the screen already shows.
+Worked examples of the device, in the course's own register:
+- A climate scientist who always warns and then reaches for hope. The opposite of warning: sell the benefits of a warmer planet so ludicrously that nobody could miss the irony. The opposite of hope: open with no hope whatsoever, played for laughs ("so I have booked three weeks on a tropical island, I am eating and drinking what I like and I am bingeing Netflix"). The opposite of "everyone must do more": we do not need everybody, we need you.
+- Antibiotic resistance. The opposite of fighting resistance: let the bugs win, fast-forward survival of the fittest, back to the dark ages, only the strongest left and climate change solved on the side; the only catch is knowing who survives. The opposite of reducing infections: eliminate them completely, in hermetically sealed pods where nobody touches, eats or uses the bathroom except through a disinfected tube. The opposite of a few people in pharma: conscript everyone into finding antibiotics, military service for drug discovery (with a genuine point about citizen science underneath).
+- Medieval manuscripts. The opposite of scholarship: it is hard work, so let's just make things up about the 12th century, who would know, it is not as if history matters. The opposite of old: turn the manuscripts into Snapchat threads. The opposite of remembering: imagine nobody knew anything beyond yesterday, no Easter Rising, no Troubles, no Second World War.
+- Self-driving cars. What if nobody was allowed to drive and only robots had licences? What if the car did not ask where you wanted to go, it took you where you needed to go? Car crashes create a lot of jobs, in fairness; maybe we do not want fewer.
+- Dark matter. What if I am wrong and dark matter does not exist? Why don't we just look for things that are easy to find? Imagine nobody knew what an atom was; not long ago that knowledge seemed to have no practical use at all.
 
-Respond with JSON: {"usualFraming": "...", "opposites": [{"line": "...", "flips": "what expectation it flips", "useWhen": "..."}], "tip": "one sentence of coaching"}`,
+Notice: each one names what it is the opposite OF (the warning, the hope, the call to action, the field's basic assumption, the scale, the timeline), and each pushes to an extreme. Most are comic; some are sincere ("what if I am wrong"). All of them land somewhere true.
+
+Now do this for the person above.
+
+1. In one plain sentence, name the message they always deliver, the one their audience has learned to expect. Use only what they wrote; do not guess at private feelings or motives.
+2. Write 4 opposites. Each one:
+   - names what it flips, in the form "The opposite of ..." (hope, urgency, precision, the expert being right, big, slow, everyone)
+   - is written as something the speaker could say out loud to open, 1 to 3 sentences, first person where it helps, with the irony impossible to miss
+   - pushes far enough to be ludicrous or startling; a mild reframing is not an opposite
+   - stays attached to their actual subject and invents no facts about their work; no square-bracket placeholders, write around any detail you do not have
+   - gives where it lands: the true point the provocation earns them, in one sentence
+   The worked examples above are for register only; do not reuse their jokes unless the subject genuinely matches.
+   Vary the tone: at least two comic, at least one sincere or vulnerable (the researcher doubting themselves, or the field's assumption questioned straight). No two may flip the same expectation.
+3. If the subject is sensitive (illness, children, death, poverty, trauma, identity), fill "care" for the opposites where it applies: one line on keeping the joke on the idea and never on the people affected. Otherwise leave "care" as an empty string.
+4. One closing sentence of coaching on how to use whichever one they choose. Write it in your own words; do not repeat the course wording the screen already shows.
+
+Respond with JSON: {"usualMessage": "...", "opposites": [{"oppositeOf": "The opposite of ...", "line": "...", "lands": "...", "care": ""}], "tip": "..."}`,
   },
 
   // Episode 2: Story --------------------------------------------------------

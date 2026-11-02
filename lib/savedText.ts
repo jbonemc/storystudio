@@ -19,6 +19,7 @@ const KEY_LABELS: Record<string, string> = {
   whyItWorks: "Why it works", expandNote: "Extension", suggestedAnswer: "Suggested answer",
   blockingBridging: "Blocking and bridging", deliveryTips: "Delivery tips", likelyQuestions: "Likely questions",
   thirtySecond: "30-second version", usualFraming: "Your usual framing", useWhen: "Use it when",
+  usualMessage: "The message your audience expects", oppositeOf: "Opposite of", lands: "Where it lands", care: "Handle with care",
   readingTheRoom: "Reading the room", goingWell: "Going well", notGoingWell: "Not going well",
   draftFeedback: "Feedback on your draft", keyMessages: "Key messages", betterAnswer: "Better answer",
 };

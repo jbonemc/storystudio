@@ -11,13 +11,14 @@ import { AIErrorNotice } from "@/components/portal/AIErrorNotice";
 import { SaveButton } from "@/components/portal/SaveButton";
 
 interface Opposite {
+  oppositeOf: string;
   line: string;
-  flips: string;
-  useWhen: string;
+  lands: string;
+  care?: string;
 }
 
 interface OppositesResult {
-  usualFraming: string;
+  usualMessage: string;
   opposites: Opposite[];
   tip: string;
 }
@@ -77,7 +78,11 @@ export function OppositesTool() {
             risky, and when it works it buys you total attention for the next
             30 seconds.
           </p>
-          <p>Use it once. It is a spice, not a meal.</p>
+          <p>
+            Take the message you always deliver and say the exact reverse,
+            pushed far enough to be funny or startling. The joke gets the
+            audience to your real point by a route they have not heard before.
+          </p>
         </div>
       </div>
 
@@ -91,7 +96,8 @@ export function OppositesTool() {
           </label>
           <p className="text-xs text-gray-400 mb-2">
             Write it the way you normally would, at a conference or to a
-            colleague. The habit is what we will flip.
+            colleague, including the message you usually end on. That is what
+            we will flip.
           </p>
           <Textarea
             id="opposites-input"
@@ -122,13 +128,13 @@ export function OppositesTool() {
 
       {result && (
         <div className="space-y-4">
-          {result.usualFraming && (
+          {result.usualMessage && (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               <p className="text-xs font-semibold text-navy/60 mb-1">
-                Your usual framing
+                The message your audience expects from you
               </p>
               <p className="text-sm text-gray-600 leading-relaxed">
-                {result.usualFraming}
+                {result.usualMessage}
               </p>
             </div>
           )}
@@ -136,7 +142,7 @@ export function OppositesTool() {
           {opposites.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-navy">
-                {opposites.length} ways to open with the opposite
+                {opposites.length} opposites to try
               </h2>
               {opposites.map((o, i) => (
                 <Card
@@ -144,6 +150,11 @@ export function OppositesTool() {
                   className="border-gray-200 hover:border-ep1/40 transition-colors"
                 >
                   <CardContent className="pt-4 pb-4">
+                    {o.oppositeOf && (
+                      <p className="text-xs font-semibold text-navy/60 mb-1.5">
+                        {o.oppositeOf}
+                      </p>
+                    )}
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-base text-navy leading-relaxed font-medium">
                         {o.line}
@@ -167,12 +178,15 @@ export function OppositesTool() {
                     </div>
                     <div className="mt-3 space-y-1 text-xs text-gray-600 leading-relaxed">
                       <p>
-                        <strong className="text-navy/70">Flips:</strong> {o.flips}
+                        <strong className="text-navy/70">Where it lands:</strong>{" "}
+                        {o.lands}
                       </p>
-                      <p>
-                        <strong className="text-navy/70">Use it when:</strong>{" "}
-                        {o.useWhen}
-                      </p>
+                      {o.care && (
+                        <p>
+                          <strong className="text-navy/70">Handle with care:</strong>{" "}
+                          {o.care}
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

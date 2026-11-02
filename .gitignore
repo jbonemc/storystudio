@@ -25,3 +25,6 @@ next-env.d.ts
 
 # .next is a symlink here, so the trailing-slash rule above misses it
 .next
+
+# Scratch renders and exports
+output/

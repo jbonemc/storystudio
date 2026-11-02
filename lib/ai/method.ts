@@ -99,7 +99,7 @@ export const METHOD = `## 1. Core mindset
 
 ## 11. The Opposites Device / Opposite Effect
 
-- "Open by saying the opposite of what the audience expects. It is risky, and when it works it buys you total attention for the next 30 seconds." "Use it once. It is a spice, not a meal."
+- "Open by saying the opposite of what the audience expects. It is risky, and when it works it buys you total attention for the next 30 seconds."
 - Labelled for "Confident speakers looking for a stronger opening."
 - "What is the standard, predictable way that people typically talk about it? Now... what is the opposite of that? For example, why not try making a case for disorganisation or explain why sales should go down instead of up."
 - Opposites are a way of "finding humour and challenging current thinking. Shrek, Ratatouille and The BFG are all opposite-story films."
