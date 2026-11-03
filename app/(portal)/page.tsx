@@ -18,10 +18,11 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FlipHorizontal, Megaphone, Compass, MessagesSquare,
 };
 
-const CARD_GRADIENTS: Record<number, string> = {
-  1: "from-[#C4B3D4] via-[#b8a3cc] to-[#a890c0]",
-  2: "from-[#E8B4C8] via-[#dea0b8] to-[#d498b0]",
-  3: "from-[#F2C4A8] via-[#ecb498] to-[#e0a888]",
+// Flat episode colours from the theme tokens, so all three cards read as one set.
+const CARD_COLOURS: Record<number, string> = {
+  1: "bg-ep1",
+  2: "bg-ep2",
+  3: "bg-ep3",
 };
 
 const SWATCH_FLOAT = [
@@ -86,25 +87,25 @@ export default function DashboardPage() {
           {episodes.map((ep, idx) => (
             <motion.div
               key={ep.slug}
-              className="min-w-[280px] sm:min-w-0 snap-center"
+              className="min-w-[280px] sm:min-w-0 snap-center h-full"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 * idx }}
             >
               <Link
                 href={`/episode/${ep.slug}`}
-                className="group block relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                className="group flex flex-col h-full relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
                 <div
-                  className={`bg-gradient-to-br ${CARD_GRADIENTS[ep.number]} p-7 pb-6`}
+                  className={`${CARD_COLOURS[ep.number]} flex flex-col flex-1 p-7 pb-6`}
                 >
-                  <span className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em]">
+                  <span className="text-[10px] font-bold text-navy/60 uppercase tracking-[0.2em]">
                     Episode {ep.number}
                   </span>
-                  <h2 className="text-3xl font-bold text-white mt-2 mb-1 tracking-tight">
+                  <h2 className="text-3xl font-bold text-navy mt-2 mb-1 tracking-tight">
                     {ep.title}
                   </h2>
-                  <p className="text-sm text-white/70 mb-6">
+                  <p className="text-sm text-navy/70 mb-6">
                     {ep.subtitle}
                   </p>
 
@@ -115,10 +116,10 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={tool.id}
-                          className="flex items-center gap-2.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 group-hover:bg-white/25 transition-colors"
+                          className="flex items-center gap-2.5 bg-white/50 rounded-lg px-3 py-2 group-hover:bg-white/70 transition-colors"
                         >
-                          <Icon className="w-3.5 h-3.5 text-white/80" />
-                          <span className="text-xs font-medium text-white/90">
+                          <Icon className="w-3.5 h-3.5 text-navy/70" />
+                          <span className="text-xs font-medium text-navy">
                             {tool.title}
                           </span>
                         </div>
@@ -126,19 +127,16 @@ export default function DashboardPage() {
                     })}
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2">
-                    <span className="text-[10px] font-medium text-white/40">
+                  <div className="mt-auto pt-4 flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-navy/60">
                       {ep.coreIdeas.length} ideas
                     </span>
-                    <span className="text-white/20">&middot;</span>
-                    <span className="text-[10px] font-medium text-white/40">
+                    <span className="text-navy/30">&middot;</span>
+                    <span className="text-[10px] font-medium text-navy/60">
                       {ep.downloads.length} download{ep.downloads.length !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>
-
-                {/* Hover shimmer */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
               </Link>
             </motion.div>
           ))}
@@ -154,7 +152,7 @@ export default function DashboardPage() {
           viewport={{ once: true, margin: "-50px" }}
         >
           <h2 className="text-2xl font-bold text-navy">
-            Three episodes. Six AI tools. Unlimited practice.
+            Three episodes. Ten AI tools. Unlimited practice.
           </h2>
         </motion.div>
 

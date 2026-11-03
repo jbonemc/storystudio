@@ -195,3 +195,8 @@ A secondary issue: even without scanners, the PKCE `code_verifier` cookie was no
 - **Requested:** turn on Story Bank (Jonathan confirmed the Supabase org is on Pro, USD 25 a month, so no extra cost).
 - **Changed:** applied `supabase/migrations/20261030_create_saved_work.sql` to project fftvpzembbaxaoqwjtgy through the Supabase connector (migration name `create_saved_work`). No code change.
 - **Verified:** `saved_work` listed with RLS on, 0 rows; REST read with the anon key returns 200 `[]` (schema cache sees it); live `/api/saved` returns 401 signed out. Not verified: a signed-in save and read-back (needs an OTP login).
+
+## 2026-11-03: Episode cards harmonised
+- **Requested:** the three episode cards on the portal home page looked ugly; harmonise them.
+- **Changed (`app/(portal)/page.tsx`):** cards are now equal height with the ideas/downloads line pinned to the bottom; flat episode colours from the theme tokens (`bg-ep1/2/3`) replace three hand-picked gradients; navy text instead of faint white on pastel; tool rows are solid white/50 with navy text; hover lift and shimmer removed (the lift made one card sit higher than the others). "Six AI tools" corrected to ten.
+- **Verified locally:** rendered on a temporary public route (deleted before commit) at 1280px: all three cards 351px tall, text legible. tsc clean. Tag `backup-2026-11-03-before-card-harmonise`.
