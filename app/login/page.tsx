@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -160,15 +161,18 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="text-center mb-10">
-          <div className="flex justify-center gap-1.5 mb-4">
-            <div className="w-6 h-8 rounded-sm bg-[#C4B3D4] -rotate-6" />
-            <div className="w-6 h-8 rounded-sm bg-[#E8B4C8] rotate-0" />
-            <div className="w-6 h-8 rounded-sm bg-[#F2C4A8] rotate-6" />
-          </div>
-          <h1 className="text-2xl font-bold text-white tracking-wide">
-            STORY STUDIO
+          <h1 className="flex justify-center">
+            {/* Official logo, white text version for the navy background */}
+            <Image
+              src="/brand/story-studio-logo-white.png"
+              alt="Story Studio"
+              width={1189}
+              height={128}
+              priority
+              className="w-full max-w-[340px] h-auto"
+            />
           </h1>
-          <p className="text-white/40 text-sm mt-1">Participant Portal</p>
+          <p className="text-white/40 text-sm mt-3">Participant Portal</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
