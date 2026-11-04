@@ -119,7 +119,7 @@ export const episodes: Episode[] = [
     colourLight: "ep2-light",
     colourCSS: "#E8B4C8",
     description:
-      "A story is not a luxury. It is the most efficient technology humans have ever invented for transferring ideas from one mind to another. In this episode you learn repeatable structures that turn any content into a compelling narrative.",
+      "Storytelling has emerged as the most persuasive communication tool we can use today. Stories drive emotion and emotion drives behaviour. When we hear a good story told well, we lean in. In this section you'll continue to develop your storytelling skills.",
     coreIdeas: [
       {
         title: "Problem - Inspiration - Payoff (PIP)",

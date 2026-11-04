@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { episodes } from "@/lib/episodes/data";
-import { Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FileText, Download, FlipHorizontal, Megaphone, Compass, MessagesSquare } from "lucide-react";
+import { FileText, Download } from "lucide-react";
+import { TOOL_ICONS as ICONS, FallbackToolIcon } from "@/lib/episodes/icons";
+import Walkthrough, { useWalkthrough } from "@/components/portal/Walkthrough";
 import { createClient } from "@/lib/supabase/client";
 
 const RESOURCES = [
@@ -13,10 +15,6 @@ const RESOURCES = [
   { name: "Episode 3: Audience", file: "episode-3--audience-.pdf", description: "Sharing your story: delivery, interviews, and adaptation" },
   { name: "Content Tool", file: "content-tool.pdf", description: "The 13-item communication planning template" },
 ];
-
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Lightbulb, BarChart3, BookOpen, RefreshCw, Target, Mic, FlipHorizontal, Megaphone, Compass, MessagesSquare,
-};
 
 // Flat episode colours from the theme tokens, so all three cards read as one set.
 const CARD_COLOURS: Record<number, string> = {
@@ -32,8 +30,11 @@ const SWATCH_FLOAT = [
 ];
 
 export default function DashboardPage() {
+  const tour = useWalkthrough();
+
   return (
     <div className="overflow-hidden">
+      <Walkthrough open={tour.open} onClose={tour.close} />
       {/* Hero with floating swatches */}
       <div className="bg-navy text-white py-20 sm:py-28 px-4 sm:px-6 relative">
         <div className="absolute inset-0 overflow-hidden">
@@ -78,6 +79,15 @@ export default function DashboardPage() {
           >
             Your participant portal. Review, practice, download.
           </motion.p>
+          <motion.button
+            onClick={tour.show}
+            className="mt-6 text-sm font-medium text-white/70 underline underline-offset-4 decoration-ep2 hover:text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Take the tour
+          </motion.button>
         </div>
       </div>
 
@@ -112,7 +122,7 @@ export default function DashboardPage() {
                   {/* Tool previews */}
                   <div className="space-y-2">
                     {ep.tools.map((tool) => {
-                      const Icon = ICONS[tool.icon] || Lightbulb;
+                      const Icon = ICONS[tool.icon] || FallbackToolIcon;
                       return (
                         <div
                           key={tool.id}
