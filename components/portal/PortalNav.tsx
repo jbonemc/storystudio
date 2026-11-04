@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { episodes } from "@/lib/episodes/data";
 import { Bookmark } from "lucide-react";
@@ -17,16 +18,18 @@ export function PortalNav() {
   return (
     <header className="bg-navy text-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-14">
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="flex gap-1">
-              <div className="w-3 h-4 bg-ep1 rounded-sm -rotate-6" />
-              <div className="w-3 h-4 bg-ep2 rounded-sm -rotate-6" />
-              <div className="w-3 h-4 bg-ep3 rounded-sm -rotate-6" />
-            </div>
-            <span className="text-sm font-bold tracking-[0.2em] uppercase">
-              Story Studio
-            </span>
+        <div className="flex items-center justify-between gap-3 h-16">
+          <Link href="/" className="flex items-center shrink min-w-0" aria-label="Story Studio home">
+            {/* Official logo (white text version for the navy bar). Phones keep it
+                smaller so the episode links still fit beside it. */}
+            <Image
+              src="/brand/story-studio-logo-white.png"
+              alt="Story Studio"
+              width={1189}
+              height={128}
+              priority
+              className="h-[18px] sm:h-9 w-auto max-w-full"
+            />
           </Link>
 
           <nav className="flex items-center gap-1">
